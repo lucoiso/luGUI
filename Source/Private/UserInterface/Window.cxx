@@ -25,10 +25,7 @@ Window::Window()
 {
 }
 
-bool Window::Initialize(std::uint16_t const              Width,
-                        std::uint16_t const              Height,
-                        strzilla::string_view const      Title,
-                        InitializationFlags const Flags)
+bool Window::Initialize(std::uint16_t const Width, std::uint16_t const Height, strzilla::string_view const Title, InitializationFlags const Flags)
 {
     if (RenderCore::Renderer::IsInitialized())
     {
@@ -145,6 +142,11 @@ void Window::SetCallbacks()
 {
     RenderCore::SetOnCommandPoolResetCallbackCallback([](std::uint8_t const Index)
     {
+        if (!IsImGuiInitialized())
+        {
+            return;
+        }
+
         ImGuiVulkanResetThreadResources(Index);
     });
 
@@ -219,7 +221,7 @@ void Window::Draw()
     if (auto const DeltaTime = Milliseconds / Denominator;
         DeltaTime >= Interval)
     {
-            LastTime = CurrentTime;
+        LastTime = CurrentTime;
 
         if (RenderCore::Renderer::IsInitialized())
         {

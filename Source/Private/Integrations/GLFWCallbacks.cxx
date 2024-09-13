@@ -18,7 +18,7 @@ using namespace luGUI;
 
 bool g_IsPressingLeft = false;
 bool g_IsPressingRight = false;
-bool g_ViewportControlsCamera = false;
+bool g_ViewportControlsCamera = true;
 bool g_ViewportHovering = false;
 bool g_CanMovementCamera    = false;
 bool g_CanMovementWindow    = false;
@@ -171,8 +171,9 @@ static void MovementWindow(GLFWwindow *const Window, double const NewCursorPosX,
 
 static void MovementCamera(GLFWwindow *const Window, double const NewCursorPosX, double const NewCursorPosY)
 {
-    if (!IsImGuiInitialized())
+    if (!g_CanMovementCamera)
     {
+        glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         return;
     }
 
@@ -182,34 +183,27 @@ static void MovementCamera(GLFWwindow *const Window, double const NewCursorPosX,
     float const OffsetX { static_cast<float>(LastCursorPosX - NewCursorPosX) };
     float const OffsetY { static_cast<float>(LastCursorPosY - NewCursorPosY) };
 
-    if (g_CanMovementCamera)
+    glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    RenderCore::Camera &Camera { RenderCore::GetCamera() };
+
+    float const Sensitivity { Camera.GetSensitivity() * 0.1F };
+
+    glm::vec3 Rotation { Camera.GetRotation() };
+
+    Rotation.x -= OffsetX * Sensitivity;
+    Rotation.y += OffsetY * Sensitivity;
+
+    if (Rotation.y > 89.F)
     {
-        glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-        RenderCore::Camera &Camera { RenderCore::GetCamera() };
-
-        float const Sensitivity { Camera.GetSensitivity() * 0.1F };
-
-        glm::vec3 Rotation { Camera.GetRotation() };
-
-        Rotation.x -= OffsetX * Sensitivity;
-        Rotation.y += OffsetY * Sensitivity;
-
-        if (Rotation.y > 89.F)
-        {
-            Rotation.y = 89.F;
-        }
-        else if (Rotation.y < -89.F)
-        {
-            Rotation.y = -89.F;
-        }
-
-        Camera.SetRotation(Rotation);
+        Rotation.y = 89.F;
     }
-    else
+    else if (Rotation.y < -89.F)
     {
-        glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        Rotation.y = -89.F;
     }
+
+    Camera.SetRotation(Rotation);
 
     LastCursorPosX = NewCursorPosX;
     LastCursorPosY = NewCursorPosY;
@@ -217,34 +211,41 @@ static void MovementCamera(GLFWwindow *const Window, double const NewCursorPosX,
 
 void luGUI::GLFWCursorPositionCallback(GLFWwindow *const Window, double const NewCursorPosX, double const NewCursorPosY)
 {
-    g_IsPressingLeft = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_RELEASE;
-    g_IsPressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_RELEASE;
-
     if (IsImGuiInitialized())
     {
         ImGuiGLFWUpdateMouse();
     }
 
-    if (glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !g_CanMovementWindow && !g_IsPressingLeft)
-    {
-        g_CanMovementWindow = IsImGuiInitialized() && !ImGui::IsAnyItemHovered();
-    }
-    else if (glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-    {
-        g_CanMovementWindow    = false;
-        g_IsResizingMainWindow = false;
-    }
+    g_IsPressingLeft = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_RELEASE;
+    g_IsPressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_RELEASE;
 
-    if (g_ViewportControlsCamera)
+    if (!g_CanMovementWindow)
     {
-        g_CanMovementCamera = g_ViewportHovering && g_IsPressingRight;
-    }
-    else
-    {
-        g_CanMovementCamera = g_IsPressingRight;
+        if (g_ViewportControlsCamera)
+        {
+            g_CanMovementCamera = g_ViewportHovering && g_IsPressingRight;
+        }
+        else
+        {
+            g_CanMovementCamera = g_IsPressingRight;
+        }
     }
 
     MovementWindow(Window, NewCursorPosX, NewCursorPosY);
+
+    if (!g_CanMovementCamera)
+    {
+        if (g_IsPressingLeft && !g_CanMovementWindow && !g_IsPressingRight)
+        {
+            g_CanMovementWindow = IsImGuiInitialized() && !ImGui::IsAnyItemHovered();
+        }
+        else if (!g_IsPressingRight)
+        {
+            g_CanMovementWindow    = false;
+            g_IsResizingMainWindow = false;
+        }
+    }
+
     MovementCamera(Window, NewCursorPosX, NewCursorPosY);
 }
 
