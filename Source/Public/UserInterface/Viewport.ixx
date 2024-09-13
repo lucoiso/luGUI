@@ -19,10 +19,7 @@ namespace luGUI
 
     public:
         explicit Viewport(Control *);
-        ~        Viewport() override;
-
-        void               TakeCameraControl(bool) const;
-        [[nodiscard]] bool IsControllingCamera() const;
+        ~Viewport() override;
 
     protected:
         void Refresh() override;

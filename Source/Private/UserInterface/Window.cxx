@@ -51,12 +51,7 @@ bool Window::Initialize(std::uint16_t const              Width,
         s_TimerManager.SetTimer(std::chrono::nanoseconds { 0 },
                                 [&]
                                 {
-                                    if (RenderCore::Renderer::Initialize(m_GLFWHandler.GetWindow()))
-                                    {
-                                        OnInitialized();
-                                        RefreshResources();
-                                    }
-
+                                    [[maybe_unused]] bool const _ = RenderCore::Renderer::Initialize(m_GLFWHandler.GetWindow());
                                     Sync.release();
                                     Draw();
                                 });

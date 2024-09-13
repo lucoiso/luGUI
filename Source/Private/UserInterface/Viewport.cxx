@@ -17,7 +17,7 @@ Viewport::Viewport(Control *const Parent)
     : Control(Parent)
 {
     RenderCore::Renderer::SetRenderOffscreen(true);
-    TakeCameraControl(true);
+    SetViewportControlsCamera(true);
 }
 
 Viewport::~Viewport()
@@ -33,16 +33,6 @@ Viewport::~Viewport()
         }
         m_ViewportDescriptorSets.clear();
     }
-}
-
-void Viewport::TakeCameraControl(bool const Value) const
-{
-    SetViewportControlsCamera(Value);
-}
-
-bool Viewport::IsControllingCamera() const
-{
-    return ViewportControlsCamera();
 }
 
 void Viewport::Refresh()
@@ -75,9 +65,10 @@ void Viewport::PrePaint()
 {
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4 { 0.F, 0.F, 0.F, 1.F });
 
-    m_Open = ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoMove) && ImGui::IsItemVisible();
-    ImGui::PopStyleColor();
+    constexpr auto Flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDecoration;
+    m_Open = ImGui::Begin("Viewport", nullptr, Flags) && ImGui::IsItemVisible();
 
+    ImGui::PopStyleColor();
     SetViewportHovering(ImGui::IsWindowHovered());
 }
 

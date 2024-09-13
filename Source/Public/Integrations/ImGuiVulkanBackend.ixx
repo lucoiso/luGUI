@@ -33,7 +33,6 @@ namespace luGUI
         void Free(VkDevice const &);
         void Destroy(VkDevice const &);
         void Reset(VkDevice const &);
-        void Wait();
     };
 
     export bool ImGuiVulkanInit(ImGuiVulkanInitInfo const &);

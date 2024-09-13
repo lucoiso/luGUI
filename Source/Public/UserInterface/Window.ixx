@@ -41,9 +41,5 @@ namespace luGUI
     protected:
         void SetCallbacks();
         void Draw();
-
-        virtual void OnInitialized()
-        {
-        }
     };
 } // namespace luGUI

@@ -629,7 +629,8 @@ void ImGuiVulkanSecondaryCommands::Initialize(VkDevice const &LogicalDevice, std
 
 void ImGuiVulkanSecondaryCommands::Free(VkDevice const &LogicalDevice)
 {
-    Wait();
+    ThreadPool::Pool const &CommandThreadPool = RenderCore::GetThreadPool();
+    CommandThreadPool.Wait();
 
     for (RenderCore::ThreadResources &ThreadResourceIt : ThreadResources)
     {
@@ -639,7 +640,8 @@ void ImGuiVulkanSecondaryCommands::Free(VkDevice const &LogicalDevice)
 
 void ImGuiVulkanSecondaryCommands::Destroy(VkDevice const &LogicalDevice)
 {
-    Wait();
+    ThreadPool::Pool const &CommandThreadPool = RenderCore::GetThreadPool();
+    CommandThreadPool.Wait();
 
     for (RenderCore::ThreadResources &ThreadResourceIt : ThreadResources)
     {
@@ -649,18 +651,13 @@ void ImGuiVulkanSecondaryCommands::Destroy(VkDevice const &LogicalDevice)
 
 void ImGuiVulkanSecondaryCommands::Reset(VkDevice const &LogicalDevice)
 {
-    Wait();
+    ThreadPool::Pool const &CommandThreadPool = RenderCore::GetThreadPool();
+    CommandThreadPool.Wait();
 
     for (RenderCore::ThreadResources &ThreadResourceIt : ThreadResources)
     {
         ThreadResourceIt.Reset(LogicalDevice);
     }
-}
-
-void ImGuiVulkanSecondaryCommands::Wait()
-{
-    ThreadPool::Pool const &CommandThreadPool = RenderCore::GetThreadPool();
-    CommandThreadPool.Wait();
 }
 
 struct ImGuiVulkanFrame
@@ -1585,23 +1582,23 @@ void luGUI::ImGuiVulkanRenderDrawData(ImDrawData *const &DrawData, VkCommandBuff
                                                                       Buffer, GlobalIdxOffset, GlobalVtxOffset]
                                                                   {
                                                                       RenderCore::ThreadResources const &Resource = SecondaryCommands.ThreadResources.at(MyIndex);
-                                                                      VkCommandBuffer const &CommandBuffer = Resource.CommandBuffer;
+                                                                      VkCommandBuffer const &UsedCommandBuffer = Resource.CommandBuffer;
 
-                                                                      RenderCore::CheckVulkanResult(vkBeginCommandBuffer(CommandBuffer, &SecondaryBeginInfo));
+                                                                      RenderCore::CheckVulkanResult(vkBeginCommandBuffer(UsedCommandBuffer, &SecondaryBeginInfo));
                                                                       {
                                                                           ImGuiVulkanSetupRenderState(DrawData,
                                                                               Backend->PipelineData.MainPipeline,
-                                                                              CommandBuffer,
+                                                                              UsedCommandBuffer,
                                                                               RenderBuffers);
 
-                                                                          ImGuiVulkanDrawRenderingData(CommandBuffer,
+                                                                          ImGuiVulkanDrawRenderingData(UsedCommandBuffer,
                                                                               Backend,
                                                                               DrawData,
                                                                               Buffer,
                                                                               GlobalIdxOffset,
                                                                               GlobalVtxOffset);
                                                                       }
-                                                                      RenderCore::CheckVulkanResult(vkEndCommandBuffer(CommandBuffer));
+                                                                      RenderCore::CheckVulkanResult(vkEndCommandBuffer(UsedCommandBuffer));
                                                                   },
                                                                   MyIndex);
 

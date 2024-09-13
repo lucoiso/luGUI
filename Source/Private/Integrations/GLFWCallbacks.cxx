@@ -13,6 +13,8 @@ import luGUI.Integrations.ImGuiGLFWBackend;
 
 using namespace luGUI;
 
+bool g_IsPressingLeft = false;
+bool g_IsPressingRight = false;
 bool g_ViewportControlsCamera = false;
 bool g_ViewportHovering = false;
 bool g_CanMovementCamera    = false;
@@ -166,7 +168,7 @@ static void MovementWindow(GLFWwindow *const Window, double const NewCursorPosX,
 
 static void MovementCamera(GLFWwindow *const Window, double const NewCursorPosX, double const NewCursorPosY)
 {
-    if (IsImGuiInitialized() && ImGui::IsAnyItemHovered())
+    if (!IsImGuiInitialized())
     {
         return;
     }
@@ -212,33 +214,31 @@ static void MovementCamera(GLFWwindow *const Window, double const NewCursorPosX,
 
 void luGUI::GLFWCursorPositionCallback(GLFWwindow *const Window, double const NewCursorPosX, double const NewCursorPosY)
 {
+    g_IsPressingLeft = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_RELEASE;
+    g_IsPressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_RELEASE;
+
     if (IsImGuiInitialized())
     {
         ImGuiGLFWUpdateMouse();
     }
 
-    static bool HasReleasedLeft = true;
-    if (glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !g_CanMovementWindow && HasReleasedLeft)
+    if (glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !g_CanMovementWindow && !g_IsPressingLeft)
     {
         g_CanMovementWindow = IsImGuiInitialized() && !ImGui::IsAnyItemHovered();
-        HasReleasedLeft     = false;
     }
     else if (glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
     {
         g_CanMovementWindow    = false;
-        HasReleasedLeft        = true;
         g_IsResizingMainWindow = false;
     }
 
-    bool const PressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_RELEASE;
-
     if (g_ViewportControlsCamera)
     {
-        g_CanMovementCamera = g_ViewportHovering && PressingRight;
+        g_CanMovementCamera = g_ViewportHovering && g_IsPressingRight;
     }
     else
     {
-        g_CanMovementCamera = PressingRight;
+        g_CanMovementCamera = g_IsPressingRight;
     }
 
     MovementWindow(Window, NewCursorPosX, NewCursorPosY);
@@ -282,5 +282,8 @@ bool luGUI::ViewportControlsCamera()
 
 void luGUI::SetViewportHovering(bool const Value)
 {
-    g_ViewportHovering = Value;
+    if (!g_IsPressingRight)
+    {
+        g_ViewportHovering = Value;
+    }
 }

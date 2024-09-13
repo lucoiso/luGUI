@@ -63,12 +63,12 @@ ImGuiGLFWData *ImGuiGLFWGetBackendData()
     return ImGui::GetCurrentContext() ? static_cast<ImGuiGLFWData *>(ImGui::GetIO().BackendPlatformUserData) : nullptr;
 }
 
-const char *ImGuiGLFWGetClipboardText(void *UserData)
+char const *ImGuiGLFWGetClipboardText(void *UserData)
 {
     return glfwGetClipboardString(static_cast<GLFWwindow *>(UserData));
 }
 
-void ImGuiGLFWSetClipboardText(void *UserData, const char *Text)
+void ImGuiGLFWSetClipboardText(void *UserData, char const *Text)
 {
     glfwSetClipboardString(static_cast<GLFWwindow *>(UserData), Text);
 }
@@ -668,7 +668,7 @@ void ImGuiGLFWUpdateMouseData()
     ImGuiPlatformIO const &PlatformIO = ImGui::GetPlatformIO();
 
     ImGuiID      MouseViewportId = 0U;
-    const ImVec2 MousePosPrev    = ImGuiIO.MousePos;
+    ImVec2 const MousePosPrev    = ImGuiIO.MousePos;
 
     std::for_each(std::execution::seq,
                   std::cbegin(PlatformIO.Viewports),
@@ -809,7 +809,7 @@ void luGUI::ImGuiGLFWUpdateMonitors()
         std::int32_t         PosY;
         glfwGetMonitorPos(Monitors[MonitorIt], &PosX, &PosY);
 
-        const GLFWvidmode *VideoMode = glfwGetVideoMode(Monitors[MonitorIt]);
+        GLFWvidmode const *VideoMode = glfwGetVideoMode(Monitors[MonitorIt]);
         if (VideoMode == nullptr)
         {
             continue;
@@ -1059,8 +1059,7 @@ ImVec2 ImGuiGLFWGetWindowSize(ImGuiViewport *Viewport)
     std::int32_t Width  = 0;
     std::int32_t Height = 0;
 
-    ImGuiGLFWViewportData const *ViewportData = static_cast<ImGuiGLFWViewportData *>(Viewport->PlatformUserData);
-    if (ViewportData != nullptr)
+    if (ImGuiGLFWViewportData const *ViewportData = static_cast<ImGuiGLFWViewportData *>(Viewport->PlatformUserData))
     {
         glfwGetWindowSize(ViewportData->Window, &Width, &Height);
     }
@@ -1083,7 +1082,7 @@ void ImGuiGLFWSetWindowSize(ImGuiViewport *Viewport, ImVec2 const Size)
     });
 }
 
-void ImGuiGLFWSetWindowTitle(ImGuiViewport *Viewport, const char *Title)
+void ImGuiGLFWSetWindowTitle(ImGuiViewport *Viewport, char const *Title)
 {
     RenderCore::Renderer::DispatchToMainThread([=]
     {
@@ -1157,7 +1156,7 @@ void ImGuiGLFWSetWindowAlpha(ImGuiViewport *Viewport, float const Alpha)
     });
 }
 
-std::int32_t ImGuiGLFWCreateVkSurface(ImGuiViewport *Viewport, ImU64 const Instance, const void *Allocator, ImU64 *Surface)
+std::int32_t ImGuiGLFWCreateVkSurface(ImGuiViewport *Viewport, ImU64 const Instance, void const *Allocator, ImU64 *Surface)
 {
     ImGuiGLFWViewportData const *ViewportData = static_cast<ImGuiGLFWViewportData *>(Viewport->PlatformUserData);
     if (ViewportData == nullptr)
@@ -1167,7 +1166,7 @@ std::int32_t ImGuiGLFWCreateVkSurface(ImGuiViewport *Viewport, ImU64 const Insta
 
     VkResult const Result = glfwCreateWindowSurface(reinterpret_cast<VkInstance>(Instance),
                                                     ViewportData->Window,
-                                                    static_cast<const VkAllocationCallbacks *>(Allocator),
+                                                    static_cast<VkAllocationCallbacks const *>(Allocator),
                                                     reinterpret_cast<VkSurfaceKHR *>(Surface));
     return Result;
 }
