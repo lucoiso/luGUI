@@ -8,6 +8,9 @@ module luGUI.Integrations.GLFWCallbacks;
 
 import RenderCore.Renderer;
 import RenderCore.Runtime.Scene;
+import RenderCore.Types.RendererStateFlags;
+import RenderCore.Types.Camera;
+import RenderCore.Utils.EnumHelpers;
 import luGUI.Integrations.ImGuiOverlay;
 import luGUI.Integrations.ImGuiGLFWBackend;
 

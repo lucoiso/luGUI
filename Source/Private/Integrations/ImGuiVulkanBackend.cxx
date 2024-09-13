@@ -10,6 +10,7 @@ module luGUI.Integrations.ImGuiVulkanBackend;
 
 import RenderCore.Types.SurfaceProperties;
 import RenderCore.Utils.Constants;
+import RenderCore.Utils.Helpers;
 import RenderCore.Renderer;
 import RenderCore.Runtime.Memory;
 import RenderCore.Runtime.Device;

@@ -8,7 +8,7 @@ module;
 
 export module luGUI.UserInterface.Image;
 
-export import luGUI.UserInterface.Control;
+import luGUI.UserInterface.Control;
 
 namespace luGUI
 {

@@ -6,7 +6,7 @@ module;
 
 export module luGUI.UserInterface.Window.Flags;
 
-export import RenderCore.Utils.EnumHelpers;
+import RenderCore.Utils.EnumHelpers;
 
 namespace luGUI
 {

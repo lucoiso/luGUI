@@ -7,6 +7,7 @@ module;
 module luGUI.Integrations.GLFWHandler;
 
 import luGUI.Integrations.GLFWCallbacks;
+import RenderCore.Utils.EnumHelpers;
 
 using namespace luGUI;
 
