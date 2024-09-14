@@ -6,7 +6,7 @@ module;
 
 export module luGUI.Integrations.ImGuiOverlay;
 
-import luGUI.UserInterface.Control;
+import luGUI.UserInterface.Controls.Control;
 import RenderCore.Types.SurfaceProperties;
 import RenderCore.Types.Allocation;
 

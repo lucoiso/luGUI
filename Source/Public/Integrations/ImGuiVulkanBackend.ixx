@@ -29,10 +29,10 @@ namespace luGUI
         std::vector<RenderCore::ThreadResources> ThreadResources {};
 
         [[nodiscard]] bool IsValid() const;
-        void Initialize(VkDevice const &, std::uint8_t);
-        void Free(VkDevice const &);
-        void Destroy(VkDevice const &);
-        void Reset(VkDevice const &);
+        void               Initialize(VkDevice const &, std::uint8_t);
+        void               Free(VkDevice const &);
+        void               Destroy(VkDevice const &);
+        void               Reset(VkDevice const &);
     };
 
     export bool ImGuiVulkanInit(ImGuiVulkanInitInfo const &);
@@ -51,7 +51,7 @@ namespace luGUI
     void ImGuiVulkanDestroyFrameRenderBuffers(RenderCore::BufferAllocation &);
     void ImGuiVulkanDestroyWindowRenderBuffers(ImGuiVulkanWindowRenderBuffers &);
 
-    void ImGuiVulkanDestroyFrame(ImGuiVulkanFrame &, ImGuiVulkanSecondaryCommands&);
+    void ImGuiVulkanDestroyFrame(ImGuiVulkanFrame &, ImGuiVulkanSecondaryCommands &);
     void ImGuiVulkanDestroyFrameSemaphores(ImGuiVulkanFrameSemaphores &);
     void ImGuiVulkanDestroyAllViewportsRenderBuffers();
 

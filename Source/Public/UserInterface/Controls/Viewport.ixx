@@ -6,9 +6,9 @@ module;
 
 #include "luGUIModule.hpp"
 
-export module luGUI.UserInterface.Viewport;
+export module luGUI.UserInterface.Controls.Viewport;
 
-import luGUI.UserInterface.Control;
+import luGUI.UserInterface.Controls.Control;
 
 namespace luGUI
 {

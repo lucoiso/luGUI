@@ -4,7 +4,7 @@
 
 module;
 
-module luGUI.UserInterface.Window;
+module luGUI.UserInterface.Controls.Window;
 
 import Timer.Manager;
 import RenderCore.Renderer;
@@ -15,6 +15,8 @@ import luGUI.Integrations.ImGuiVulkanBackend;
 import luGUI.Integrations.ImGuiGLFWBackend;
 import luGUI.Integrations.GLFWCallbacks;
 import luGUI.Integrations.GLFWHandler;
+import luGUI.UserInterface.Singletons.ImageManager;
+import luGUI.UserInterface.Singletons.FontManager;
 
 using namespace luGUI;
 
@@ -76,6 +78,8 @@ void Window::Shutdown()
                             {
                                 if (RenderCore::Renderer::IsInitialized())
                                 {
+                                    ImageManager::Get().UnregisterAllTextures();
+                                    FontManager::Get().UnregisterAllFonts();
                                     RenderCore::Renderer::Shutdown();
                                 }
 
@@ -241,4 +245,9 @@ void Window::Draw()
                             {
                                 Draw();
                             });
+}
+
+void Window::Refresh()
+{
+    ImageManager::Get().RefreshTextures();
 }

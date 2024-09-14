@@ -134,51 +134,48 @@ void luGUI::GLFWKeyCallback([[maybe_unused]] GLFWwindow *const  Window,
 
 static void MovementWindow(GLFWwindow *const Window, double const NewCursorPosX, double const NewCursorPosY)
 {
-    if (!g_CanMovementWindow)
+    static bool IsDragging = false;
+
+    if (g_CanMovementWindow && g_IsPressingLeft && glfwGetWindowAttrib(Window, GLFW_DECORATED) == GLFW_FALSE)
     {
-        return;
+        static double InitialCursorPosX = 0.0;
+        static double InitialCursorPosY = 0.0;
+
+        if (!IsDragging)
+        {
+            InitialCursorPosX = NewCursorPosX;
+            InitialCursorPosY = NewCursorPosY;
+            IsDragging = true;
+        }
+
+        std::int32_t WindowX;
+        std::int32_t WindowY;
+        glfwGetWindowPos(Window, &WindowX, &WindowY);
+
+        auto const NewPosX = WindowX + static_cast<std::int32_t>(NewCursorPosX - InitialCursorPosX);
+        auto const NewPosY = WindowY + static_cast<std::int32_t>(NewCursorPosY - InitialCursorPosY);
+
+        glfwSetWindowPos(Window, NewPosX, NewPosY);
     }
-
-    static double InitialCursorPosX = 0.0;
-    static double InitialCursorPosY = 0.0;
-    static bool   IsDragging        = false;
-
-    if (glfwGetWindowAttrib(Window, GLFW_DECORATED) == GLFW_FALSE)
+    else
     {
-        if (glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        {
-            if (!IsDragging)
-            {
-                glfwGetCursorPos(Window, &InitialCursorPosX, &InitialCursorPosY);
-                IsDragging = true;
-            }
-
-            std::int32_t WindowX;
-            std::int32_t WindowY;
-            glfwGetWindowPos(Window, &WindowX, &WindowY);
-
-            auto const NewPosX = WindowX + static_cast<std::int32_t>(NewCursorPosX - InitialCursorPosX);
-            auto const NewPosY = WindowY + static_cast<std::int32_t>(NewCursorPosY - InitialCursorPosY);
-
-            glfwSetWindowPos(Window, NewPosX, NewPosY);
-        }
-        else
-        {
-            IsDragging = false;
-        }
+        IsDragging = false;
     }
 }
 
 static void MovementCamera(GLFWwindow *const Window, double const NewCursorPosX, double const NewCursorPosY)
 {
+    static double LastCursorPosX = NewCursorPosX;
+    static double LastCursorPosY = NewCursorPosY;
+
     if (!g_CanMovementCamera)
     {
+        LastCursorPosX = NewCursorPosX;
+        LastCursorPosY = NewCursorPosY;
+
         glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         return;
     }
-
-    static double LastCursorPosX = NewCursorPosX;
-    static double LastCursorPosY = NewCursorPosY;
 
     float const OffsetX { static_cast<float>(LastCursorPosX - NewCursorPosX) };
     float const OffsetY { static_cast<float>(LastCursorPosY - NewCursorPosY) };
@@ -216,36 +213,29 @@ void luGUI::GLFWCursorPositionCallback(GLFWwindow *const Window, double const Ne
         ImGuiGLFWUpdateMouse();
     }
 
-    g_IsPressingLeft = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_RELEASE;
-    g_IsPressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_RELEASE;
+    g_IsPressingLeft = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    g_IsPressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
 
-    if (!g_CanMovementWindow)
+    if (g_IsPressingLeft && !g_CanMovementWindow && !g_IsPressingRight)
     {
-        if (g_ViewportControlsCamera)
-        {
-            g_CanMovementCamera = g_ViewportHovering && g_IsPressingRight;
-        }
-        else
-        {
-            g_CanMovementCamera = g_IsPressingRight;
-        }
+        g_CanMovementWindow = IsImGuiInitialized() && !ImGui::IsAnyItemHovered();
+    }
+    else if (!g_IsPressingLeft)
+    {
+        g_CanMovementWindow    = false;
+        g_IsResizingMainWindow = false;
+    }
+
+    if (g_ViewportControlsCamera)
+    {
+        g_CanMovementCamera = g_ViewportHovering && g_IsPressingRight;
+    }
+    else
+    {
+        g_CanMovementCamera = g_IsPressingRight;
     }
 
     MovementWindow(Window, NewCursorPosX, NewCursorPosY);
-
-    if (!g_CanMovementCamera)
-    {
-        if (g_IsPressingLeft && !g_CanMovementWindow && !g_IsPressingRight)
-        {
-            g_CanMovementWindow = IsImGuiInitialized() && !ImGui::IsAnyItemHovered();
-        }
-        else if (!g_IsPressingRight)
-        {
-            g_CanMovementWindow    = false;
-            g_IsResizingMainWindow = false;
-        }
-    }
-
     MovementCamera(Window, NewCursorPosX, NewCursorPosY);
 }
 

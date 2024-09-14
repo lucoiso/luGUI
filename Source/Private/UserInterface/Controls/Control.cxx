@@ -4,7 +4,7 @@
 
 module;
 
-module luGUI.UserInterface.Control;
+module luGUI.UserInterface.Controls.Control;
 
 using namespace luGUI;
 

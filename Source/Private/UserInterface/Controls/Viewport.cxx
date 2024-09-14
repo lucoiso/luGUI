@@ -4,7 +4,7 @@
 
 module;
 
-module luGUI.UserInterface.Viewport;
+module luGUI.UserInterface.Controls.Viewport;
 
 import RenderCore.Renderer;
 import RenderCore.Runtime.Scene;

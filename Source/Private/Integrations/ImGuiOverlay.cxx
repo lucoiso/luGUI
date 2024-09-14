@@ -101,6 +101,7 @@ void luGUI::ReleaseImGuiResources()
 {
     ImGuiVulkanShutdown();
     ImGuiGLFWShutdown();
+
     ImGui::DestroyContext();
 
     if (g_ImGuiDescriptorPool != VK_NULL_HANDLE)

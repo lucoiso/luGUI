@@ -644,7 +644,10 @@ void luGUI::ImGuiGLFWShutdown()
 
     for (std::uint8_t CursorIt = 0U; CursorIt < ImGuiMouseCursor_COUNT; ++CursorIt)
     {
-        glfwDestroyCursor(Backend->MouseCursors.at(CursorIt));
+        if (auto* const Cursor = Backend->MouseCursors.at(CursorIt))
+        {
+            glfwDestroyCursor(Cursor);
+        }
     }
 
     #ifdef _WIN32

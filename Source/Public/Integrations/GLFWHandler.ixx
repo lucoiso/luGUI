@@ -6,7 +6,7 @@ module;
 
 export module luGUI.Integrations.GLFWHandler;
 
-import luGUI.UserInterface.Window.Flags;
+import luGUI.UserInterface.Controls.Window.Flags;
 
 namespace luGUI
 {

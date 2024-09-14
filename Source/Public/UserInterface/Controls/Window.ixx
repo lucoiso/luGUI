@@ -6,12 +6,12 @@ module;
 
 #include "luGUIModule.hpp"
 
-export module luGUI.UserInterface.Window;
+export module luGUI.UserInterface.Controls.Window;
 
 import luGUI.Integrations.GLFWHandler;
 
-import luGUI.UserInterface.Control;
-import luGUI.UserInterface.Window.Flags;
+import luGUI.UserInterface.Controls.Control;
+import luGUI.UserInterface.Controls.Window.Flags;
 
 namespace luGUI
 {
@@ -41,5 +41,7 @@ namespace luGUI
     protected:
         void SetCallbacks();
         void Draw();
+
+        virtual void Refresh() override;
     };
 } // namespace luGUI
