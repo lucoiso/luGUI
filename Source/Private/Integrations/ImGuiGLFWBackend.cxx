@@ -6,6 +6,8 @@
 
 module;
 
+#include <imgui.h>
+
 #ifdef _WIN32
 #undef APIENTRY
 #define GLFW_EXPOSE_NATIVE_WIN32

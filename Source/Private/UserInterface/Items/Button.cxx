@@ -4,6 +4,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.UserInterface.Items.Button;
 
 using namespace luGUI;

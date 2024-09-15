@@ -6,6 +6,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.Integrations.ImGuiVulkanBackend;
 
 import RenderCore.Types.SurfaceProperties;

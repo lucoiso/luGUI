@@ -4,6 +4,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.UserInterface.Controls.Viewport;
 
 import RenderCore.Renderer;

@@ -6,6 +6,8 @@ module;
 
 #include "luGUIModule.hpp"
 
+#include <imgui.h>
+
 export module luGUI.UserInterface.Items.Input;
 
 export import luGUI.UserInterface.Items.Item;

@@ -4,6 +4,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.UserInterface.Singletons.FontManager;
 
 import luGUI.Integrations.ImGuiVulkanBackend;

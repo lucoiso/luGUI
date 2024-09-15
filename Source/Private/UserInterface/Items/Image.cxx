@@ -4,6 +4,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.UserInterface.Items.Image;
 
 import luGUI.UserInterface.Singletons.ImageManager;

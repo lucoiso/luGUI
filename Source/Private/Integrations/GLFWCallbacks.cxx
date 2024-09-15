@@ -4,6 +4,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.Integrations.GLFWCallbacks;
 
 import RenderCore.Renderer;

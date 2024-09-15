@@ -6,6 +6,8 @@
 
 module;
 
+#include <imgui.h>
+
 export module luGUI.Integrations.ImGuiVulkanBackend;
 
 import RenderCore.Runtime.Command;

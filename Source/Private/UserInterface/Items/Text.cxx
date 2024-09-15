@@ -4,6 +4,8 @@
 
 module;
 
+#include <imgui.h>
+
 module luGUI.UserInterface.Items.Text;
 
 import luGUI.UserInterface.Singletons.FontManager;

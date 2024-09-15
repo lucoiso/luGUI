@@ -4,6 +4,8 @@
 
 module;
 
+#include <stb_image.h>
+
 module luGUI.UserInterface.Controls.Window;
 
 import Timer.Manager;
@@ -100,6 +102,18 @@ void Window::Shutdown()
 bool Window::IsOpen() const
 {
     return m_GLFWHandler.IsOpen();
+}
+
+void Window::SetIcon(strzilla::string_view const &Path) const
+{
+    if (std::empty(Path))
+    {
+        return;
+    }
+
+    GLFWimage Icon;
+    Icon.pixels = stbi_load(std::data(Path), &Icon.width, &Icon.height, nullptr, 4);
+    glfwSetWindowIcon(m_GLFWHandler.GetWindow(), 1, &Icon); stbi_image_free(Icon.pixels);
 }
 
 void Window::PollEvents()

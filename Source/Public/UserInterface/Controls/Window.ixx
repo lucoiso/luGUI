@@ -36,6 +36,8 @@ namespace luGUI
         void Shutdown();
         [[nodiscard]] bool IsOpen() const;
 
+        void SetIcon(strzilla::string_view const& Path) const;
+
         virtual void PollEvents();
 
     protected:

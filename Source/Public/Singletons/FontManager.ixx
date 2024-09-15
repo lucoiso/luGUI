@@ -6,6 +6,8 @@ module;
 
 #include "luGUIModule.hpp"
 
+#include <imgui.h>
+
 export module luGUI.UserInterface.Singletons.FontManager;
 
 namespace luGUI
