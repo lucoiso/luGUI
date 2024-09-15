@@ -29,8 +29,8 @@ bool FontManager::RegisterFont(strzilla::string_view const &Key, strzilla::strin
         return false;
     }
 
-    ImGuiIO const &IO = ImGui::GetIO();
-    ImFont* NewFont = IO.Fonts->AddFontFromFileTTF(std::data(Path), Pixels);
+    ImGuiIO const &IO      = ImGui::GetIO();
+    ImFont *       NewFont = IO.Fonts->AddFontFromFileTTF(std::data(Path), Pixels);
 
     if (!NewFont)
     {

@@ -16,13 +16,13 @@ import luGUI.Integrations.ImGuiGLFWBackend;
 
 using namespace luGUI;
 
-bool g_IsPressingLeft = false;
-bool g_IsPressingRight = false;
+bool g_IsPressingLeft         = false;
+bool g_IsPressingRight        = false;
 bool g_ViewportControlsCamera = true;
-bool g_ViewportHovering = false;
-bool g_CanMovementCamera    = false;
-bool g_CanMovementWindow    = false;
-bool g_IsResizingMainWindow = false;
+bool g_ViewportHovering       = false;
+bool g_CanMovementCamera      = false;
+bool g_CanMovementWindow      = false;
+bool g_IsResizingMainWindow   = false;
 
 bool luGUI::IsResizingMainWindow()
 {
@@ -36,11 +36,12 @@ void luGUI::GLFWWindowCloseRequestedCallback(GLFWwindow *const Window)
 }
 
 void luGUI::GLFWWindowResizedCallback([[maybe_unused]] GLFWwindow *const  Window,
-                                           [[maybe_unused]] std::int32_t const Width,
-                                           [[maybe_unused]] std::int32_t const Height)
+                                      [[maybe_unused]] std::int32_t const Width,
+                                      [[maybe_unused]] std::int32_t const Height)
 {
-    g_IsResizingMainWindow                    = true;
-    constexpr RenderCore::RendererStateFlags RefreshFlags = RenderCore::RendererStateFlags::INVALID_SIZE | RenderCore::RendererStateFlags::PENDING_DEVICE_PROPERTIES_UPDATE;
+    g_IsResizingMainWindow                                = true;
+    constexpr RenderCore::RendererStateFlags RefreshFlags = RenderCore::RendererStateFlags::INVALID_SIZE |
+                                                            RenderCore::RendererStateFlags::PENDING_DEVICE_PROPERTIES_UPDATE;
 
     if (Width <= 0 || Height <= 0)
     {
@@ -60,10 +61,10 @@ void luGUI::GLFWErrorCallback(std::int32_t const Error, char const *const Descri
 }
 
 void luGUI::GLFWKeyCallback([[maybe_unused]] GLFWwindow *const  Window,
-                                 std::int32_t const                  Key,
-                                 [[maybe_unused]] std::int32_t const Scancode,
-                                 std::int32_t const                  Action,
-                                 [[maybe_unused]] std::int32_t const Mods)
+                            std::int32_t const                  Key,
+                            [[maybe_unused]] std::int32_t const Scancode,
+                            std::int32_t const                  Action,
+                            [[maybe_unused]] std::int32_t const Mods)
 {
     RenderCore::Camera &                 Camera               = RenderCore::GetCamera();
     RenderCore::CameraMovementStateFlags CurrentMovementState = Camera.GetCameraMovementStateFlags();
@@ -145,7 +146,7 @@ static void MovementWindow(GLFWwindow *const Window, double const NewCursorPosX,
         {
             InitialCursorPosX = NewCursorPosX;
             InitialCursorPosY = NewCursorPosY;
-            IsDragging = true;
+            IsDragging        = true;
         }
 
         std::int32_t WindowX;
@@ -213,12 +214,18 @@ void luGUI::GLFWCursorPositionCallback(GLFWwindow *const Window, double const Ne
         ImGuiGLFWUpdateMouse();
     }
 
-    g_IsPressingLeft = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    g_IsPressingLeft  = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
     g_IsPressingRight = glfwGetMouseButton(Window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+
+    static bool IsInteracting = false;
+    if (IsImGuiInitialized() && ImGui::IsAnyItemHovered())
+    {
+        IsInteracting = g_IsPressingLeft;
+    }
 
     if (g_IsPressingLeft && !g_CanMovementWindow && !g_IsPressingRight)
     {
-        g_CanMovementWindow = IsImGuiInitialized() && !ImGui::IsAnyItemHovered();
+        g_CanMovementWindow = !IsInteracting && IsImGuiInitialized();
     }
     else if (!g_IsPressingLeft)
     {
@@ -247,7 +254,7 @@ void luGUI::GLFWCursorScrollCallback([[maybe_unused]] GLFWwindow *const Window, 
     }
 
     RenderCore::Camera &Camera = RenderCore::GetCamera();
-    float const Zoom   = static_cast<float>(OffsetY) * 0.1f;
+    float const         Zoom   = static_cast<float>(OffsetY) * 0.1f;
     Camera.SetPosition(Camera.GetPosition() + Camera.GetFront() * Zoom);
 }
 

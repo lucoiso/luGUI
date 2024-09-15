@@ -8,7 +8,7 @@ module;
 
 export module luGUI.UserInterface.Items.Text;
 
-import luGUI.UserInterface.Items.Item;
+export import luGUI.UserInterface.Items.Item;
 
 namespace luGUI
 {
@@ -19,15 +19,15 @@ namespace luGUI
 
     public:
         Text() = default;
-        explicit Text(strzilla::string_view const& Key);
-        explicit Text(strzilla::string_view const& Key, strzilla::string_view const& Text);
+        explicit Text(strzilla::string_view const &Key);
+        explicit Text(strzilla::string_view const &Key, strzilla::string_view const &Text);
 
         [[nodiscard]] inline strzilla::string_view GetKey() const
         {
             return m_Key;
         }
 
-        inline void SetKey(strzilla::string_view const& Key)
+        inline void SetKey(strzilla::string_view const &Key)
         {
             m_Key = Key;
         }
@@ -37,11 +37,11 @@ namespace luGUI
             return m_Text;
         }
 
-        inline void SetText(strzilla::string_view const& Text)
+        inline void SetText(strzilla::string_view const &Text)
         {
             m_Text = Text;
         }
 
-        void Draw() const override;
+        void Draw() override;
     };
 } // namespace luGUI

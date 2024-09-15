@@ -17,11 +17,11 @@ Image::Image(strzilla::string_view const &Key)
 
 Image::Image(strzilla::string_view const &Key, ImageDefinitions &&Definitions)
     : m_Key(Key)
-    , m_Definitions(Definitions)
+  , m_Definitions(Definitions)
 {
 }
 
-void Image::Draw() const
+void Image::Draw()
 {
     VkDescriptorSet const ImageDescriptor = ImageManager::Get().GetDescriptor(m_Key);
     if (ImageDescriptor == VK_NULL_HANDLE)

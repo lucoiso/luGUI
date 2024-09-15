@@ -8,7 +8,7 @@ module;
 
 export module luGUI.UserInterface.Items.Image;
 
-import luGUI.UserInterface.Items.Item;
+export import luGUI.UserInterface.Items.Item;
 
 namespace luGUI
 {
@@ -51,6 +51,6 @@ namespace luGUI
             m_Definitions = Definitions;
         }
 
-        void Draw() const override;
+        void Draw() override;
     };
 } // namespace luGUI

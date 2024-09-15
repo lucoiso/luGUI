@@ -13,8 +13,17 @@ namespace luGUI
     export class LUGUIMODULE_API Item
     {
     public:
-        inline virtual void Draw() const
+        Item()  = default;
+        ~Item() = default;
+
+        virtual void Draw()
         {
+        }
+
+        template <typename Type, typename... Args>
+        static constexpr std::shared_ptr<Type> Construct(Args &&... Arguments)
+        {
+            return std::make_shared<Type>(std::forward<Args>(Arguments)...);
         }
     };
 } // namespace luGUI

@@ -17,13 +17,13 @@ Text::Text(strzilla::string_view const &Key)
 
 Text::Text(strzilla::string_view const &Key, strzilla::string_view const &Text)
     : m_Key(Key)
-    , m_Text(Text)
+  , m_Text(Text)
 {
 }
 
-void Text::Draw() const
+void Text::Draw()
 {
-    ImFont* const Font = FontManager::Get().GetFont(m_Key);
+    ImFont *const Font = FontManager::Get().GetFont(m_Key);
     if (Font)
     {
         ImGui::PushFont(Font);

@@ -663,10 +663,10 @@ void ImGuiVulkanSecondaryCommands::Reset(VkDevice const &LogicalDevice)
 
 struct ImGuiVulkanFrame
 {
-    VkCommandPool   CommandPool { VK_NULL_HANDLE };
-    VkCommandBuffer CommandBuffer { VK_NULL_HANDLE };
-    VkFence         Fence { VK_NULL_HANDLE };
-    bool            PendingWait { false };
+    VkCommandPool               CommandPool { VK_NULL_HANDLE };
+    VkCommandBuffer             CommandBuffer { VK_NULL_HANDLE };
+    VkFence                     Fence { VK_NULL_HANDLE };
+    bool                        PendingWait { false };
     RenderCore::ImageAllocation Backbuffer {};
 };
 
@@ -678,12 +678,12 @@ struct ImGuiVulkanFrameSemaphores
 
 struct ImGuiVulkanWindow
 {
-    std::uint32_t                                          Width {};
-    std::uint32_t                                          Height {};
-    VkSwapchainKHR                                         Swapchain { VK_NULL_HANDLE };
-    VkSurfaceKHR                                           Surface { VK_NULL_HANDLE };
-    std::uint32_t                                          FrameIndex {};
-    std::uint32_t                                          SemaphoreIndex {};
+    std::uint32_t                                                      Width {};
+    std::uint32_t                                                      Height {};
+    VkSwapchainKHR                                                     Swapchain { VK_NULL_HANDLE };
+    VkSurfaceKHR                                                       Surface { VK_NULL_HANDLE };
+    std::uint32_t                                                      FrameIndex {};
+    std::uint32_t                                                      SemaphoreIndex {};
     std::array<ImGuiVulkanFrame, RenderCore::g_ImageCount>             Frames {};
     std::array<ImGuiVulkanFrameSemaphores, RenderCore::g_ImageCount>   FrameSemaphores {};
     std::array<ImGuiVulkanSecondaryCommands, RenderCore::g_ImageCount> SecondaryCommands {};
@@ -691,7 +691,7 @@ struct ImGuiVulkanWindow
 
 struct ImGuiVulkanWindowRenderBuffers
 {
-    std::uint32_t                              Index { 0U };
+    std::uint32_t                                                      Index { 0U };
     std::array<RenderCore::BufferAllocation, RenderCore::g_ImageCount> Buffers {};
 };
 
@@ -706,9 +706,9 @@ struct ImGuiVulkanData
 {
     ImGuiVulkanInitInfo            VulkanInitInfo {};
     VkDescriptorSetLayout          DescriptorSetLayout {};
-    RenderCore::PipelineData                   PipelineData {};
+    RenderCore::PipelineData       PipelineData {};
     VkSampler                      FontSampler {};
-    RenderCore::ImageAllocation                FontImage {};
+    RenderCore::ImageAllocation    FontImage {};
     VkDescriptorSet                FontDescriptorSet {};
     ImGuiVulkanWindowRenderBuffers MainWindowRenderBuffers {};
 };
@@ -718,10 +718,10 @@ ImGuiVulkanData *ImGuiVulkanGetBackendData()
     return ImGui::GetCurrentContext() ? static_cast<ImGuiVulkanData *>(ImGui::GetIO().BackendRendererUserData) : nullptr;
 }
 
-void ImGuiVulkanSetupRenderState(ImDrawData const *const &DrawData,
-                                 VkPipeline const &       Pipeline,
-                                 VkCommandBuffer const &  CommandBuffer,
-                                 RenderCore::BufferAllocation const & RenderBuffers)
+void ImGuiVulkanSetupRenderState(ImDrawData const *const &           DrawData,
+                                 VkPipeline const &                  Pipeline,
+                                 VkCommandBuffer const &             CommandBuffer,
+                                 RenderCore::BufferAllocation const &RenderBuffers)
 {
     if (DrawData->TotalVtxCount <= 0)
     {
@@ -834,7 +834,7 @@ void ImGuiVulkanCreateWindow(ImGuiViewport *Viewport)
     {
         std::lock_guard const Lock { RenderCore::Renderer::GetMutex() };
 
-            VkInstance const &      Instance       = RenderCore::GetInstance();
+        VkInstance const &      Instance       = RenderCore::GetInstance();
         VkPhysicalDevice const &PhysicalDevice = RenderCore::GetPhysicalDevice();
         VkDevice const &        LogicalDevice  = RenderCore::GetLogicalDevice();
 
@@ -856,9 +856,9 @@ void ImGuiVulkanCreateWindow(ImGuiViewport *Viewport)
 
         ImGuiPlatformIO const &PlatformIO = ImGui::GetPlatformIO();
         RenderCore::CheckVulkanResult(static_cast<VkResult>(PlatformIO.Platform_CreateVkSurface(Viewport,
-                                                                                    reinterpret_cast<ImU64>(Instance),
-                                                                                    nullptr,
-                                                                                    reinterpret_cast<ImU64 *>(&WindowData.Surface))));
+                                                                                                reinterpret_cast<ImU64>(Instance),
+                                                                                                nullptr,
+                                                                                                reinterpret_cast<ImU64 *>(&WindowData.Surface))));
 
         VkBool32 SupportResult = VK_FALSE;
         vkGetPhysicalDeviceSurfaceSupportKHR(PhysicalDevice, QueueFamilyIndex, WindowData.Surface, &SupportResult);
@@ -942,8 +942,12 @@ void ImGuiVulkanRenderWindow(ImGuiViewport *Viewport, void *)
         PendingWait = false;
     }
 
-    if (vkAcquireNextImageKHR(LogicalDevice, WindowData.Swapchain, RenderCore::g_Timeout, ImageAcquiredSemaphore, VK_NULL_HANDLE, &WindowData.FrameIndex) !=
-        VK_SUCCESS)
+    if (vkAcquireNextImageKHR(LogicalDevice,
+                              WindowData.Swapchain,
+                              RenderCore::g_Timeout,
+                              ImageAcquiredSemaphore,
+                              VK_NULL_HANDLE,
+                              &WindowData.FrameIndex) != VK_SUCCESS)
     {
         return;
     }
@@ -982,7 +986,8 @@ void ImGuiVulkanRenderWindow(ImGuiViewport *Viewport, void *)
     ImGuiVulkanRenderDrawData(Viewport->DrawData, CommandBuffer);
     vkCmdEndRendering(CommandBuffer);
 
-    RenderCore::RequestImageLayoutTransition<RenderCore::g_AttachmentLayout, RenderCore::g_PresentLayout, RenderCore::g_ImageAspect>(CommandBuffer, BackBuffer.Image, BackBuffer.Format);
+    RenderCore::RequestImageLayoutTransition<RenderCore::g_AttachmentLayout, RenderCore::g_PresentLayout,
+                                             RenderCore::g_ImageAspect>(CommandBuffer, BackBuffer.Image, BackBuffer.Format);
 
     RenderCore::CheckVulkanResult(vkEndCommandBuffer(CommandBuffer));
 
@@ -1477,7 +1482,7 @@ void luGUI::ImGuiVulkanRenderDrawData(ImDrawData *const &DrawData, VkCommandBuff
     auto *ViewportRenderData = static_cast<ImGuiVulkanViewportData *>(DrawData->OwnerViewport->RendererUserData);
     auto &[Index, Buffers]   = ViewportRenderData->RenderBuffers;
 
-    Index                           = (Index + 1U) % static_cast<std::uint32_t>(std::size(Buffers));
+    Index                                       = (Index + 1U) % static_cast<std::uint32_t>(std::size(Buffers));
     RenderCore::BufferAllocation &RenderBuffers = Buffers.at(Index);
 
     VmaAllocator const &Allocator = RenderCore::GetAllocator();
@@ -1504,10 +1509,14 @@ void luGUI::ImGuiVulkanRenderDrawData(ImDrawData *const &DrawData, VkCommandBuff
 
     if (!RenderBuffers.IsValid())
     {
-        constexpr VkBufferUsageFlags BufferUsage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        constexpr VkBufferUsageFlags BufferUsage      = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         constexpr auto               BufferIdentifier = "IMGUI_RENDER";
-        RenderBuffers.Size = TotalSize;
-        [[maybe_unused]] auto const _ = RenderCore::CreateBuffer(TotalSize, BufferUsage, BufferIdentifier, RenderBuffers.Buffer, RenderBuffers.Allocation);
+        RenderBuffers.Size                            = TotalSize;
+        [[maybe_unused]] auto const _                 = RenderCore::CreateBuffer(TotalSize,
+                                                                                 BufferUsage,
+                                                                                 BufferIdentifier,
+                                                                                 RenderBuffers.Buffer,
+                                                                                 RenderBuffers.Allocation);
     }
 
     vmaMapMemory(Allocator, RenderBuffers.Allocation, &RenderBuffers.MappedData);
@@ -1582,10 +1591,12 @@ void luGUI::ImGuiVulkanRenderDrawData(ImDrawData *const &DrawData, VkCommandBuff
                                         CommandThreadPool.AddTask([&SecondaryBeginInfo, &SecondaryCommands, MyIndex, DrawData, Backend, RenderBuffers,
                                                                       Buffer, GlobalIdxOffset, GlobalVtxOffset]
                                                                   {
-                                                                      RenderCore::ThreadResources const &Resource = SecondaryCommands.ThreadResources.at(MyIndex);
+                                                                      RenderCore::ThreadResources const &Resource = SecondaryCommands.ThreadResources.
+                                                                              at(MyIndex);
                                                                       VkCommandBuffer const &UsedCommandBuffer = Resource.CommandBuffer;
 
-                                                                      RenderCore::CheckVulkanResult(vkBeginCommandBuffer(UsedCommandBuffer, &SecondaryBeginInfo));
+                                                                      RenderCore::CheckVulkanResult(vkBeginCommandBuffer(UsedCommandBuffer,
+                                                                                                        &SecondaryBeginInfo));
                                                                       {
                                                                           ImGuiVulkanSetupRenderState(DrawData,
                                                                               Backend->PipelineData.MainPipeline,
@@ -1666,10 +1677,10 @@ bool luGUI::ImGuiVulkanCreateFontsTexture()
 
     std::pair<VkBuffer, VmaAllocation> StagingAllocation;
     VmaAllocationInfo                  StagingInfo = RenderCore::CreateBuffer(BufferSize,
-                                                                  VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                                                  "STAGING_TEXTURE",
-                                                                  StagingAllocation.first,
-                                                                  StagingAllocation.second);
+                                                                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                                              "STAGING_TEXTURE",
+                                                                              StagingAllocation.first,
+                                                                              StagingAllocation.second);
 
     RenderCore::CheckVulkanResult(vmaMapMemory(Allocator, StagingAllocation.second, &StagingInfo.pMappedData));
     std::memcpy(StagingInfo.pMappedData, ImageData, BufferSize);
@@ -1680,23 +1691,21 @@ bool luGUI::ImGuiVulkanCreateFontsTexture()
     };
 
     RenderCore::CreateImage(ImageFormat,
-                NewAllocation.Extent,
-                RenderCore::g_ImageTiling,
-                VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-                RenderCore::g_TextureMemoryUsage,
-                "TEXTURE",
-                NewAllocation.Image,
-                NewAllocation.Allocation);
+                            NewAllocation.Extent,
+                            RenderCore::g_ImageTiling,
+                            VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+                            RenderCore::g_TextureMemoryUsage,
+                            "TEXTURE",
+                            NewAllocation.Image,
+                            NewAllocation.Allocation);
 
-    RenderCore::RequestImageLayoutTransition<RenderCore::g_UndefinedLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, RenderCore::g_ImageAspect>(CommandBuffers.back(),
-        NewAllocation.Image,
-        NewAllocation.Format);
+    RenderCore::RequestImageLayoutTransition<RenderCore::g_UndefinedLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                             RenderCore::g_ImageAspect>(CommandBuffers.back(), NewAllocation.Image, NewAllocation.Format);
 
     RenderCore::CopyBufferToImage(CommandBuffers.back(), StagingAllocation.first, NewAllocation.Image, NewAllocation.Extent);
 
-    RenderCore::RequestImageLayoutTransition<VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, RenderCore::g_ReadLayout, RenderCore::g_ImageAspect>(CommandBuffers.back(),
-                                                                                                        NewAllocation.Image,
-                                                                                                        NewAllocation.Format);
+    RenderCore::RequestImageLayoutTransition<VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, RenderCore::g_ReadLayout,
+                                             RenderCore::g_ImageAspect>(CommandBuffers.back(), NewAllocation.Image, NewAllocation.Format);
 
     RenderCore::CreateImageView(NewAllocation.Image, NewAllocation.Format, RenderCore::g_ImageAspect, NewAllocation.View);
     vmaUnmapMemory(Allocator, StagingAllocation.second);

@@ -43,6 +43,10 @@ SET(PRIVATE_MODULES
         "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Items/Item.cxx"
         "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Items/Text.cxx"
         "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Items/Image.cxx"
+        "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Items/Button.cxx"
+        "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Items/Input.cxx"
+        "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Panels/Stack.cxx"
+        "${PRIVATE_MODULES_BASE_DIRECTORY}/UserInterface/Panels/Grid.cxx"
         "${PRIVATE_MODULES_BASE_DIRECTORY}/Singletons/ImageManager.cxx"
         "${PRIVATE_MODULES_BASE_DIRECTORY}/Singletons/FontManager.cxx"
 )
@@ -60,6 +64,10 @@ SET(PUBLIC_MODULES
         "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Items/Item.ixx"
         "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Items/Text.ixx"
         "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Items/Image.ixx"
+        "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Items/Button.ixx"
+        "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Items/Input.ixx"
+        "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Panels/Stack.ixx"
+        "${PUBLIC_MODULES_BASE_DIRECTORY}/UserInterface/Panels/Grid.ixx"
         "${PUBLIC_MODULES_BASE_DIRECTORY}/Singletons/ImageManager.ixx"
         "${PUBLIC_MODULES_BASE_DIRECTORY}/Singletons/FontManager.ixx"
 )
