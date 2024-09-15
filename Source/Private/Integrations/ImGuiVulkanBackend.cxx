@@ -1748,7 +1748,7 @@ bool luGUI::ImGuiVulkanInit(ImGuiVulkanInitInfo const &VulkanInfo)
 
     auto *Backend                   = IM_NEW(ImGuiVulkanData)();
     ImGuiIO.BackendRendererUserData = static_cast<void *>(Backend);
-    ImGuiIO.BackendRendererName     = "RenderCore_ImGui_Vulkan";
+    ImGuiIO.BackendRendererName     = "luGUI_ImGui_Vulkan";
     ImGuiIO.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset | ImGuiBackendFlags_RendererHasViewports;
 
     Backend->VulkanInitInfo = VulkanInfo;

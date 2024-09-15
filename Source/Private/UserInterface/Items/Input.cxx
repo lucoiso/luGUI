@@ -12,7 +12,11 @@ std::int32_t luGUI::InputTextCallback(ImGuiInputTextCallbackData *const Data)
 {
     if (auto const UserData = static_cast<strzilla::string *>(Data->UserData))
     {
-        UserData->resize(Data->BufTextLen);
+        if (std::size(*UserData) < Data->BufTextLen)
+        {
+            UserData->resize(Data->BufTextLen);
+        }
+
         Data->Buf = UserData->c_str();
     }
 

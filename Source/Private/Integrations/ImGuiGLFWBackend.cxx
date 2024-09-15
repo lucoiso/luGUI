@@ -560,67 +560,64 @@ LRESULT CALLBACK ImGuiGLFWWndProc(HWND const Handle, UINT const Message, WPARAM 
 
 bool ImGuiGLFWInit(GLFWwindow *Window, bool const InstallCallbacks)
 {
-    RenderCore::Renderer::DispatchToMainThread([Window, InstallCallbacks]
+    ImGuiIO &ImGuiIO = ImGui::GetIO();
+
+    auto *Backend                   = IM_NEW(ImGuiGLFWData)();
+    ImGuiIO.BackendPlatformUserData = static_cast<void *>(Backend);
+    ImGuiIO.BackendPlatformName     = "luGUI_ImGui_GLFW";
+    ImGuiIO.BackendFlags |= ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos | ImGuiBackendFlags_PlatformHasViewports |
+            ImGuiBackendFlags_HasMouseHoveredViewport;
+
+    Backend->Window             = Window;
+    Backend->Time               = 0.0;
+    Backend->WantUpdateMonitors = true;
+
+    ImGuiIO.SetClipboardTextFn = ImGuiGLFWSetClipboardText;
+    ImGuiIO.GetClipboardTextFn = ImGuiGLFWGetClipboardText;
+    ImGuiIO.ClipboardUserData  = Backend->Window;
+
+    GLFWerrorfun const ErrorCallback                      = glfwSetErrorCallback(nullptr);
+    Backend->MouseCursors.at(ImGuiMouseCursor_Arrow)      = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_TextInput)  = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_ResizeNS)   = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_ResizeEW)   = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_Hand)       = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_ResizeAll)  = glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_ResizeNESW) = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_ResizeNWSE) = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
+    Backend->MouseCursors.at(ImGuiMouseCursor_NotAllowed) = glfwCreateStandardCursor(GLFW_NOT_ALLOWED_CURSOR);
+
+    glfwSetErrorCallback(ErrorCallback);
+    [[maybe_unused]] auto const _ = glfwGetError(nullptr);
+
+    if (InstallCallbacks)
     {
-        ImGuiIO &ImGuiIO = ImGui::GetIO();
+        ImGuiGLFWInstallCallbacks(Window);
+    }
 
-        auto *Backend                   = IM_NEW(ImGuiGLFWData)();
-        ImGuiIO.BackendPlatformUserData = static_cast<void *>(Backend);
-        ImGuiIO.BackendPlatformName     = "RenderCore_ImGui_GLFW";
-        ImGuiIO.BackendFlags |= ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos | ImGuiBackendFlags_PlatformHasViewports |
-                ImGuiBackendFlags_HasMouseHoveredViewport;
+    ImGuiGLFWUpdateMonitors();
+    glfwSetMonitorCallback(ImGuiGLFWMonitorCallback);
 
-        Backend->Window             = Window;
-        Backend->Time               = 0.0;
-        Backend->WantUpdateMonitors = true;
+    ImGuiViewport *MainViewport  = ImGui::GetMainViewport();
+    MainViewport->PlatformHandle = static_cast<void *>(Backend->Window);
+    #ifdef _WIN32
+    MainViewport->PlatformHandleRaw = glfwGetWin32Window(Backend->Window);
+    #elif defined(__APPLE__)
+    MainViewport->PlatformHandleRaw = static_cast<void *>(glfwGetCocoaWindow(Backend->Window));
+    #else
+    IM_UNUSED(MainViewport);
+    #endif
 
-        ImGuiIO.SetClipboardTextFn = ImGuiGLFWSetClipboardText;
-        ImGuiIO.GetClipboardTextFn = ImGuiGLFWGetClipboardText;
-        ImGuiIO.ClipboardUserData  = Backend->Window;
+    if (ImGuiIO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        ImGuiGLFWInitPlatformInterface();
+    }
 
-        GLFWerrorfun const ErrorCallback                      = glfwSetErrorCallback(nullptr);
-        Backend->MouseCursors.at(ImGuiMouseCursor_Arrow)      = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_TextInput)  = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_ResizeNS)   = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_ResizeEW)   = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_Hand)       = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_ResizeAll)  = glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_ResizeNESW) = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_ResizeNWSE) = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
-        Backend->MouseCursors.at(ImGuiMouseCursor_NotAllowed) = glfwCreateStandardCursor(GLFW_NOT_ALLOWED_CURSOR);
-
-        glfwSetErrorCallback(ErrorCallback);
-        [[maybe_unused]] auto const _ = glfwGetError(nullptr);
-
-        if (InstallCallbacks)
-        {
-            ImGuiGLFWInstallCallbacks(Window);
-        }
-
-        ImGuiGLFWUpdateMonitors();
-        glfwSetMonitorCallback(ImGuiGLFWMonitorCallback);
-
-        ImGuiViewport *MainViewport  = ImGui::GetMainViewport();
-        MainViewport->PlatformHandle = static_cast<void *>(Backend->Window);
-        #ifdef _WIN32
-        MainViewport->PlatformHandleRaw = glfwGetWin32Window(Backend->Window);
-        #elif defined(__APPLE__)
-        MainViewport->PlatformHandleRaw = static_cast<void *>(glfwGetCocoaWindow(Backend->Window));
-        #else
-        IM_UNUSED(MainViewport);
-        #endif
-
-        if (ImGuiIO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGuiGLFWInitPlatformInterface();
-        }
-
-        #ifdef _WIN32
-        Backend->PrevWndProc = reinterpret_cast<WNDPROC>(GetWindowLongPtrW(static_cast<HWND>(MainViewport->PlatformHandleRaw), GWLP_WNDPROC));
-        IM_ASSERT(Backend->PrevWndProc != nullptr);
-        SetWindowLongPtrW(static_cast<HWND>(MainViewport->PlatformHandleRaw), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiGLFWWndProc));
-        #endif
-    });
+    #ifdef _WIN32
+    Backend->PrevWndProc = reinterpret_cast<WNDPROC>(GetWindowLongPtrW(static_cast<HWND>(MainViewport->PlatformHandleRaw), GWLP_WNDPROC));
+    IM_ASSERT(Backend->PrevWndProc != nullptr);
+    SetWindowLongPtrW(static_cast<HWND>(MainViewport->PlatformHandleRaw), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiGLFWWndProc));
+    #endif
 
     return true;
 }

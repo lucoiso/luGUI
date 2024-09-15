@@ -42,6 +42,7 @@ namespace luGUI
         ValueType                      m_CurrentInput {};
         ConfigType                     m_Config { g_NullInputSettings };
         strzilla::string               m_Label {};
+        strzilla::string               m_ID {};
         std::function<void(ValueType)> m_OnChanged {};
 
     public:
@@ -49,11 +50,13 @@ namespace luGUI
 
         explicit Input(strzilla::string_view const &Label)
             : m_Label(Label)
+            , m_ID(strzilla::string { "##" } + m_Label)
         {
         }
 
         explicit Input(strzilla::string_view const &Label, std::function<void(ValueType)> &&OnChanged)
             : m_Label(Label)
+            , m_ID(strzilla::string { "##" } + m_Label)
           , m_OnChanged(OnChanged)
         {
         }
@@ -61,12 +64,14 @@ namespace luGUI
         explicit Input(strzilla::string_view const &Label, ConfigType const &Config)
             : m_Config(Config)
           , m_Label(Label)
+          , m_ID(strzilla::string { "##" } + m_Label)
         {
         }
 
         explicit Input(strzilla::string_view const &Label, std::function<void(ValueType)> &&OnChanged, ConfigType const &Config)
             : m_Config(Config)
           , m_Label(Label)
+          , m_ID(strzilla::string { "##" } + m_Label)
           , m_OnChanged(OnChanged)
         {
         }
@@ -103,33 +108,36 @@ namespace luGUI
 
             bool Commited = false;
 
+            ImGui::Text(std::data(m_Label));
+            ImGui::SameLine();
+
             if constexpr (std::is_same_v<DecayedInputType, strzilla::string>)
             {
                 if constexpr (std::is_same_v<DecayedConfigType, TextInputSettings>)
                 {
                     if (m_Config.Multiline)
                     {
-                        Commited = ImGui::InputTextMultiline(std::data(m_Label),
+                        Commited = ImGui::InputTextMultiline(std::data(m_ID),
                                                              std::data(m_CurrentInput),
                                                              std::size(m_CurrentInput),
                                                              m_Config.Size,
                                                              ImGuiInputTextFlags_CallbackResize,
                                                              InputTextCallback,
-                                                             static_cast<void *>(m_CurrentInput.c_str()));
+                                                             static_cast<void *>(&m_CurrentInput));
                     }
                     else
                     {
-                        Commited = ImGui::InputText(std::data(m_Label),
+                        Commited = ImGui::InputText(std::data(m_ID),
                                                     std::data(m_CurrentInput),
                                                     std::size(m_CurrentInput),
                                                     ImGuiInputTextFlags_CallbackResize,
                                                     InputTextCallback,
-                                                    static_cast<void *>(m_CurrentInput.c_str()));
+                                                    static_cast<void *>(&m_CurrentInput));
                     }
                 }
                 else
                 {
-                    Commited = ImGui::InputText(std::data(m_Label),
+                    Commited = ImGui::InputText(std::data(m_ID),
                                                 std::data(m_CurrentInput),
                                                 std::size(m_CurrentInput),
                                                 ImGuiInputTextFlags_CallbackResize,
@@ -145,16 +153,16 @@ namespace luGUI
                     {
                         if (m_Config.Slider)
                         {
-                            Commited = ImGui::SliderFloat(std::data(m_Label), &m_CurrentInput, m_Config.MinValue, m_Config.MaxValue, m_Config.Format);
+                            Commited = ImGui::SliderFloat(std::data(m_ID), &m_CurrentInput, m_Config.MinValue, m_Config.MaxValue, m_Config.Format);
                         }
                         else
                         {
-                            Commited = ImGui::InputFloat(std::data(m_Label), &m_CurrentInput, m_Config.Step, m_Config.Step, m_Config.Format);
+                            Commited = ImGui::InputFloat(std::data(m_ID), &m_CurrentInput, m_Config.Step, m_Config.Step, m_Config.Format);
                         }
                     }
                     else
                     {
-                        Commited = ImGui::InputFloat(std::data(m_Label), &m_CurrentInput);
+                        Commited = ImGui::InputFloat(std::data(m_ID), &m_CurrentInput);
                     }
                 }
                 else
@@ -163,16 +171,16 @@ namespace luGUI
                     {
                         if (m_Config.Slider)
                         {
-                            Commited = ImGui::SliderInt(std::data(m_Label), &m_CurrentInput, m_Config.MinValue, m_Config.MaxValue, m_Config.Format);
+                            Commited = ImGui::SliderInt(std::data(m_ID), &m_CurrentInput, m_Config.MinValue, m_Config.MaxValue, m_Config.Format);
                         }
                         else
                         {
-                            Commited = ImGui::InputInt(std::data(m_Label), &m_CurrentInput, m_Config.Step, m_Config.Step);
+                            Commited = ImGui::InputInt(std::data(m_ID), &m_CurrentInput, m_Config.Step, m_Config.Step);
                         }
                     }
                     else
                     {
-                        Commited = ImGui::InputInt(std::data(m_Label), &m_CurrentInput);
+                        Commited = ImGui::InputInt(std::data(m_ID), &m_CurrentInput);
                     }
                 }
             }

@@ -21,7 +21,7 @@ Button::Button(strzilla::string_view const &Label, std::function<void()> &&OnCli
 
 void Button::Draw()
 {
-    if (ImGui::Button(std::data(m_Label)))
+    if (ImGui::Button(std::data(m_Label)) && m_OnClicked)
     {
         m_OnClicked();
     }
