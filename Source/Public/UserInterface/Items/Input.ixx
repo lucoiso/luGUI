@@ -31,8 +31,8 @@ namespace luGUI
     {
         bool        Slider { false };
         T           Step { std::is_integral_v<T> ? 1 : 0 };
-        T           MaxValue { 0 };
-        T           MinValue { 100 };
+        T           MaxValue { 100 };
+        T           MinValue { 0 };
         const char *Format { std::is_integral_v<T> ? "%d" : "%.3F" };
     };
 
