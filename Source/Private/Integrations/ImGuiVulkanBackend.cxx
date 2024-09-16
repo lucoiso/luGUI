@@ -1614,7 +1614,7 @@ void luGUI::ImGuiVulkanRenderDrawData(ImDrawData *const &DrawData, VkCommandBuff
                                                                       }
                                                                       RenderCore::CheckVulkanResult(vkEndCommandBuffer(UsedCommandBuffer));
                                                                   },
-                                                                  MyIndex);
+                                                                  CommandThreadPool.GetThreadCount() - MyIndex - 1);
 
                                         WorkerThreads.at(MyIndex) = true;
                                     });
