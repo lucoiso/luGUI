@@ -12,9 +12,6 @@ class LuGuiRecipe(ConanFile):
     generators = "CMakeDeps"
 
     def requirements(self):
-        # https://conan.io/center/recipes/glfw
-        self.requires("glfw/3.4")
-
         # https://conan.io/center/recipes/imgui
         self.requires("imgui/1.91.0-docking")
 
@@ -28,8 +25,6 @@ class LuGuiRecipe(ConanFile):
         self.requires("meshoptimizer/0.21")
 
     def configure(self):
-        self.options["glfw/*"].shared = False
-        self.options["glfw/*"].vulkan_static = False
         self.options["imgui/*"].shared = True
         self.options["boost/*"].shared = True
         self.options["boost/*"].without_cobalt = True

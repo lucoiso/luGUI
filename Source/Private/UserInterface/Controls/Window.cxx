@@ -12,8 +12,8 @@ module;
 #include <GLFW/glfw3.h>
 
 #ifdef _WIN32
-    #undef APIENTRY
-    #define GLFW_EXPOSE_NATIVE_WIN32
+#undef APIENTRY
+#define GLFW_EXPOSE_NATIVE_WIN32
 #endif // _WIN32
 #ifdef __APPLE__
     #define GLFW_EXPOSE_NATIVE_COCOA
@@ -153,22 +153,17 @@ strzilla::string Window::GetTitle() const
 }
 
 #ifdef _WIN32
-void Window::SetAsChildOf(::HWND const ParentHandle)
+void Window::SetAsChildOf(::HWND const ParentHandle) const
 {
-    GLFWwindow* const MyWindow = m_GLFWHandler.GetWindow();
-    ::HWND const MyHandle = glfwGetWin32Window(MyWindow);
+    RenderCore::Renderer::DispatchToMainThread([this, ParentHandle]
+    {
+        if (GLFWwindow *const MyWindow = m_GLFWHandler.GetWindow())
+        {
+            glfwAttachToWin32Window(MyWindow, ParentHandle);
+        }
+    });
 
-    ::SetParent(MyHandle, ParentHandle);
-
-    ::LONG Style = ::GetWindowLong(MyHandle, GWL_STYLE);
-    Style &= ~WS_POPUP;
-    Style |= WS_CHILDWINDOW;
-    ::SetWindowLong(MyHandle, GWL_STYLE, Style);
-
-    ::ShowWindow(MyHandle, SW_SHOW);
-    ::ShowWindow(ParentHandle, SW_SHOW);
-
-    ::SetWindowLongPtrW(MyHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiGLFWWndProc));
+    glfwPostEmptyEvent();
 }
 #endif // _WIN32
 

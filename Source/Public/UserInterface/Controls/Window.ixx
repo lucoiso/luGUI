@@ -48,7 +48,7 @@ namespace luGUI
 
         #ifdef _WIN32
         /** Experimental and unstable */
-        void SetAsChildOf(::HWND ParentHandle);
+        void SetAsChildOf(::HWND ParentHandle) const;
         #endif // _WIN32
 
         virtual void PollEvents();
