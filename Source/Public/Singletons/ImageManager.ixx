@@ -33,9 +33,9 @@ namespace luGUI
     public:
         [[nodiscard]] static ImageManager &Get();
 
-        [[nodiscard]] inline ImageData GetImage(strzilla::string_view const &Key) const
+        [[nodiscard]] inline ImageData GetImage(const char* const Key) const
         {
-            if (std::empty(Key))
+            if (!Key)
             {
                 return ImageData {};
             }
@@ -44,9 +44,9 @@ namespace luGUI
             return m_Textures.contains(Hash) ? m_Textures.at(Hash) : ImageData {};
         }
 
-        [[nodiscard]] inline VkDescriptorSet GetDescriptor(strzilla::string_view const &Key) const
+        [[nodiscard]] inline VkDescriptorSet GetDescriptor(const char* const Key) const
         {
-            if (std::empty(Key))
+            if (!Key)
             {
                 return VK_NULL_HANDLE;
             }
@@ -55,11 +55,11 @@ namespace luGUI
             return m_Textures.contains(Hash) ? m_Textures.at(Hash).DescriptorSet : VK_NULL_HANDLE;
         }
 
-        [[nodiscard]] bool RegisterTexture(strzilla::string_view const &Key, std::shared_ptr<RenderCore::Texture> &&Texture);
-        [[nodiscard]] bool RegisterTexture(strzilla::string_view const &Key, strzilla::string_view const &Path);
+        [[nodiscard]] bool RegisterTexture(const char* const Key, std::shared_ptr<RenderCore::Texture> &&Texture);
+        [[nodiscard]] bool RegisterTexture(const char* const Key, strzilla::string_view const &Path);
         void               RegisterTextureArray(std::unordered_map<strzilla::string_view, strzilla::string_view> &&KeysAndPaths);
 
-        void UnregisterTexture(strzilla::string_view const &Key);
+        void UnregisterTexture(const char* const Key);
         void UnregisterAllTextures();
 
         void RefreshTextures();

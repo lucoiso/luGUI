@@ -20,9 +20,9 @@ ImageManager &ImageManager::Get()
     return Singleton;
 }
 
-bool ImageManager::RegisterTexture(strzilla::string_view const &Key, std::shared_ptr<RenderCore::Texture> &&Texture)
+bool ImageManager::RegisterTexture(const char* const Key, std::shared_ptr<RenderCore::Texture> &&Texture)
 {
-    if (std::empty(Key) || Texture == nullptr)
+    if (!Key || Texture == nullptr)
     {
         return false;
     }
@@ -50,7 +50,7 @@ bool ImageManager::RegisterTexture(strzilla::string_view const &Key, std::shared
     return true;
 }
 
-bool ImageManager::RegisterTexture(strzilla::string_view const &Key, strzilla::string_view const &Path)
+bool ImageManager::RegisterTexture(const char* const Key, strzilla::string_view const &Path)
 {
     std::vector<std::shared_ptr<RenderCore::Texture>> const LoadedTextures = RenderCore::Renderer::LoadImages({ Path });
     if (std::empty(LoadedTextures))
@@ -96,12 +96,12 @@ void ImageManager::RegisterTextureArray(std::unordered_map<strzilla::string_view
         if (MatchingTexture != std::cend(LoadedTextures))
         {
             std::shared_ptr<RenderCore::Texture> TextureToAdd = *MatchingTexture;
-            [[maybe_unused]] bool const          Result       = RegisterTexture(Key, std::move(TextureToAdd));
+            [[maybe_unused]] bool const          Result       = RegisterTexture(std::data(Key), std::move(TextureToAdd));
         }
     }
 }
 
-void ImageManager::UnregisterTexture(strzilla::string_view const &Key)
+void ImageManager::UnregisterTexture(const char* const Key)
 {
     if (auto const Hash = m_HashCreator(Key);
         m_Textures.contains(Hash))

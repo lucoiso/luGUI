@@ -10,8 +10,9 @@ module luGUI.UserInterface.Items.Item;
 
 using namespace luGUI;
 
-Item::Item(float Width)
+Item::Item(float const Width, Alignment const Alignment)
     : m_Width(Width)
+  , m_Alignment(Alignment)
 {
 }
 
@@ -23,6 +24,8 @@ void Item::Draw()
     {
         ImGui::PushItemWidth(m_Width);
     }
+
+    // TODO : Align according to m_Alignment
 
     Render();
 

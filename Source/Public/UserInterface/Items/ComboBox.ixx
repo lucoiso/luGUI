@@ -21,15 +21,18 @@ namespace luGUI
         std::function<void(strzilla::string)> m_OnChanged {};
 
     public:
-        ComboBox() = default;
-        explicit ComboBox(float Width);
-        explicit ComboBox(strzilla::string_view const &Label, float Width = 0.F);
-        explicit ComboBox(strzilla::string_view const &Label, std::vector<strzilla::string> *Options, float Width = 0.F);
-        explicit ComboBox(strzilla::string_view const &Label, std::function<void(strzilla::string)> &&OnChanged, float Width = 0.F);
-        explicit ComboBox(strzilla::string_view const &           Label,
-                          std::vector<strzilla::string> *         Options,
-                          std::function<void(strzilla::string)> &&OnChanged,
-                          float                                   Width = 0.F);
+        template <typename... Args>
+        explicit inline ComboBox(const char *const &                     Label,
+                                 std::vector<strzilla::string> *const    Options,
+                                 std::function<void(strzilla::string)> &&OnChanged,
+                                 Args &&...                              Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Label(Label)
+          , m_Options(Options)
+          , m_OnChanged(OnChanged)
+        {
+            UpdateInternalOptions();
+        }
 
         [[nodiscard]] inline std::int32_t GetCurrentSelection() const
         {
@@ -46,7 +49,7 @@ namespace luGUI
             return m_Label;
         }
 
-        inline void SetLabel(strzilla::string_view const &Label)
+        inline void SetLabel(const char *const Label)
         {
             m_Label = Label;
         }

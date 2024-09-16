@@ -11,30 +11,6 @@ module luGUI.UserInterface.Panels.Stack;
 
 using namespace luGUI;
 
-Stack::Stack(float const Width)
-    : Item(Width)
-{
-}
-
-Stack::Stack(Orientation const Orientation, float const Width)
-    : Item(Width)
-  , m_Orientation(Orientation)
-{
-}
-
-Stack::Stack(std::vector<std::shared_ptr<Item>> &&Items, float const Width)
-    : Item(Width)
-  , m_Items(Items)
-{
-}
-
-Stack::Stack(Orientation const Orientation, std::vector<std::shared_ptr<Item>> &&Items, float const Width)
-    : Item(Width)
-  , m_Orientation(Orientation)
-  , m_Items(Items)
-{
-}
-
 void Stack::Draw()
 {
     if (std::empty(m_Items))

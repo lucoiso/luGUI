@@ -10,14 +10,28 @@ export module luGUI.UserInterface.Items.Item;
 
 namespace luGUI
 {
+    export enum class Alignment
+    {
+        None,
+        Left,
+        TopLeft,
+        Top,
+        TopRight,
+        Right,
+        BottomLeft,
+        Bottom,
+        BottomRight,
+        Center
+    };
+
     export class LUGUIMODULE_API Item
     {
     protected:
-        float m_Width { 0.F };
+        float     m_Width { 0.F };
+        Alignment m_Alignment { Alignment::None };
 
     public:
-        Item() = default;
-        explicit Item(float Width);
+        explicit Item(float Width = 0.F, Alignment Alignment = Alignment::None);
         ~Item() = default;
 
         virtual void Draw();
@@ -35,6 +49,16 @@ namespace luGUI
         inline void SetWidth(float const Width)
         {
             m_Width = Width;
+        }
+
+        [[nodiscard]] inline Alignment GetAlignment() const
+        {
+            return m_Alignment;
+        }
+
+        inline void SetAlignment(Alignment const Alignment)
+        {
+            m_Alignment = Alignment;
         }
 
         template <typename Type, typename... Args>

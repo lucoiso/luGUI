@@ -10,47 +10,6 @@ module luGUI.UserInterface.Items.ComboBox;
 
 using namespace luGUI;
 
-ComboBox::ComboBox(float const Width)
-    : Item(Width)
-{
-}
-
-ComboBox::ComboBox(strzilla::string_view const &Label, float const Width)
-    : Item(Width)
-  , m_Label(Label)
-{
-    UpdateInternalOptions();
-}
-
-ComboBox::ComboBox(strzilla::string_view const &Label, std::vector<strzilla::string> *const Options, float const Width)
-    : Item(Width)
-  , m_Label(Label)
-  , m_Options(Options)
-{
-    UpdateInternalOptions();
-}
-
-ComboBox::ComboBox(strzilla::string_view const &Label, std::function<void(strzilla::string)> &&OnChanged, float const Width)
-    : Item(Width)
-  , m_Label(Label)
-  , m_OnChanged(OnChanged)
-{
-    SetWidth(Width);
-    UpdateInternalOptions();
-}
-
-ComboBox::ComboBox(strzilla::string_view const &           Label,
-                   std::vector<strzilla::string> *const    Options,
-                   std::function<void(strzilla::string)> &&OnChanged,
-                   float const                             Width)
-    : Item(Width)
-  , m_Label(Label)
-  , m_Options(Options)
-  , m_OnChanged(OnChanged)
-{
-    UpdateInternalOptions();
-}
-
 void ComboBox::Render()
 {
     if (!m_Options || std::empty(*m_Options))

@@ -11,17 +11,6 @@ module luGUI.UserInterface.Panels.Grid;
 
 using namespace luGUI;
 
-Grid::Grid(float const Width)
-    : Item(Width)
-{
-}
-
-Grid::Grid(std::vector<std::vector<std::shared_ptr<Item>>> &&Items, float const Width)
-    : Item(Width)
-  , m_Items(Items)
-{
-}
-
 void Grid::Draw()
 {
     if (std::empty(m_Items))

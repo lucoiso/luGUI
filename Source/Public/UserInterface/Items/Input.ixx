@@ -48,41 +48,18 @@ namespace luGUI
         std::function<void(ValueType)> m_OnChanged {};
 
     public:
-        Input() = default;
-
-        explicit Input(float const Width)
-            : Item(Width)
-        {
-        }
-
-        explicit Input(strzilla::string_view const &Label, float const Width = 0.F)
-            : Item(Width)
-          , m_Label(Label)
-          , m_ID(strzilla::string { "##" } + m_Label)
-        {
-        }
-
-        explicit Input(strzilla::string_view const &Label, std::function<void(ValueType)> &&OnChanged, float const Width = 0.F)
-            : Item(Width)
+        template <typename... Args>
+        explicit Input(const char *const Label, std::function<void(ValueType)> &&OnChanged, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
           , m_Label(Label)
           , m_ID(strzilla::string { "##" } + m_Label)
           , m_OnChanged(OnChanged)
         {
         }
 
-        explicit Input(strzilla::string_view const &Label, ConfigType const &Config, float const Width = 0.F)
-            : Item(Width)
-          , m_Config(Config)
-          , m_Label(Label)
-          , m_ID(strzilla::string { "##" } + m_Label)
-        {
-        }
-
-        explicit Input(strzilla::string_view const &    Label,
-                       std::function<void(ValueType)> &&OnChanged,
-                       ConfigType const &               Config,
-                       float const                      Width = 0.F)
-            : Item(Width)
+        template <typename... Args>
+        explicit Input(const char *const Label, std::function<void(ValueType)> &&OnChanged, ConfigType const &Config, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
           , m_Config(Config)
           , m_Label(Label)
           , m_ID(strzilla::string { "##" } + m_Label)
@@ -95,7 +72,7 @@ namespace luGUI
             return m_Label;
         }
 
-        inline void SetKey(strzilla::string_view const &Label)
+        inline void SetKey(const char *const Label)
         {
             m_Label = Label;
         }

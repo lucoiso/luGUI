@@ -29,17 +29,27 @@ namespace luGUI
         ImageDefinitions m_Definitions {};
 
     public:
-        Image() = default;
-        explicit Image(float Width);
-        explicit Image(strzilla::string_view const &Key, float Width = 0.F);
-        explicit Image(strzilla::string_view const &Key, ImageDefinitions &&Definitions, float Width = 0.F);
+        template <typename... Args>
+        explicit inline Image(const char *const Key, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Key(Key)
+        {
+        }
+
+        template <typename... Args>
+        explicit inline Image(const char *const Key, ImageDefinitions &&Definitions, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Key(Key)
+          , m_Definitions(Definitions)
+        {
+        }
 
         [[nodiscard]] inline strzilla::string_view GetKey() const
         {
             return m_Key;
         }
 
-        inline void SetKey(strzilla::string_view const &Key)
+        inline void SetKey(const char *const Key)
         {
             m_Key = Key;
         }

@@ -18,17 +18,20 @@ namespace luGUI
         strzilla::string m_Text {};
 
     public:
-        Text() = default;
-        explicit Text(float Width);
-        explicit Text(strzilla::string_view const &Key, float Width = 0.F);
-        explicit Text(strzilla::string_view const &Key, strzilla::string_view const &Text, float Width = 0.F);
+        template <typename... Args>
+        explicit inline Text(const char *const Key, const char *const &Text, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Key(Key)
+          , m_Text(Text)
+        {
+        }
 
         [[nodiscard]] inline strzilla::string_view GetKey() const
         {
             return m_Key;
         }
 
-        inline void SetKey(strzilla::string_view const &Key)
+        inline void SetKey(const char *const Key)
         {
             m_Key = Key;
         }
@@ -38,7 +41,7 @@ namespace luGUI
             return m_Text;
         }
 
-        inline void SetText(strzilla::string_view const &Text)
+        inline void SetText(const char *const &Text)
         {
             m_Text = Text;
         }

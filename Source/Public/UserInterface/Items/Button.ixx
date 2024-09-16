@@ -18,17 +18,20 @@ namespace luGUI
         std::function<void()> m_OnClicked {};
 
     public:
-        Button() = default;
-        explicit Button(float Width);
-        explicit Button(strzilla::string_view const &Label, float Width = 0.F);
-        explicit Button(strzilla::string_view const &Label, std::function<void()> &&OnClicked, float Width = 0.F);
+        template <typename... Args>
+        explicit inline Button(const char *const Label, std::function<void()> &&OnClicked, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Label(Label)
+          , m_OnClicked(OnClicked)
+        {
+        }
 
         [[nodiscard]] inline strzilla::string_view GetLabel() const
         {
             return m_Label;
         }
 
-        inline void SetKey(strzilla::string_view const &Label)
+        inline void SetKey(const char *const Label)
         {
             m_Label = Label;
         }

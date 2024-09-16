@@ -24,11 +24,33 @@ namespace luGUI
         std::vector<std::shared_ptr<Item>> m_Items {};
 
     public:
-        Stack() = default;
-        explicit Stack(float Width);
-        explicit Stack(Orientation Orientation, float Width = 0.F);
-        explicit Stack(std::vector<std::shared_ptr<Item>> &&Items, float Width = 0.F);
-        Stack(Orientation Orientation, std::vector<std::shared_ptr<Item>> &&Items, float Width = 0.F);
+        template <typename... Args>
+        explicit inline Stack(Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+        {
+        }
+
+        template <typename... Args>
+        explicit inline Stack(Orientation const Orientation, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Orientation(Orientation)
+        {
+        }
+
+        template <typename... Args>
+        explicit inline Stack(std::vector<std::shared_ptr<Item>> &&Items, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Items(Items)
+        {
+        }
+
+        template <typename... Args>
+        explicit inline Stack(Orientation const Orientation, std::vector<std::shared_ptr<Item>> &&Items, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Orientation(Orientation)
+          , m_Items(Items)
+        {
+        }
 
         template <typename... Args>
         static constexpr std::shared_ptr<Stack> Create(Args &&... Arguments)

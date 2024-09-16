@@ -18,9 +18,9 @@ FontManager &FontManager::Get()
     return Singleton;
 }
 
-bool FontManager::RegisterFont(strzilla::string_view const &Key, strzilla::string_view const &Path, float const Pixels)
+bool FontManager::RegisterFont(const char* const Key, strzilla::string_view const &Path, float const Pixels)
 {
-    if (std::empty(Key) || std::empty(Path) || Pixels <= 0.F)
+    if (!Key || std::empty(Path) || Pixels <= 0.F)
     {
         return false;
     }
@@ -53,7 +53,7 @@ void FontManager::BuildFonts()
     ImGuiVulkanCreateFontsTexture();
 }
 
-void FontManager::UnregisterFont(strzilla::string_view const &Key)
+void FontManager::UnregisterFont(const char* const Key)
 {
     if (auto const Hash = m_HashCreator(Key);
         m_Fonts.contains(Hash))

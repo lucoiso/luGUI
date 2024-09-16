@@ -38,10 +38,10 @@ namespace luGUI
             return m_Fonts.contains(Hash) ? m_Fonts.at(Hash) : nullptr;
         }
 
-        [[nodiscard]] bool RegisterFont(strzilla::string_view const &Key, strzilla::string_view const &Path, float Pixels = 18.F);
+        [[nodiscard]] bool RegisterFont(const char* const Key, strzilla::string_view const &Path, float Pixels = 18.F);
         void BuildFonts();
 
-        void UnregisterFont(strzilla::string_view const &Key);
+        void UnregisterFont(const char* const Key);
         void UnregisterAllFonts();
     };
 } // namespace luGUI
