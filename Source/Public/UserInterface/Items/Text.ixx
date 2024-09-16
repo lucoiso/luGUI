@@ -19,7 +19,7 @@ namespace luGUI
 
     public:
         template <typename... Args>
-        explicit inline Text(const char *const Key, const char *const &Text, Args &&... Arguments)
+        explicit constexpr Text(const char *const Key, const char *const &Text, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Key(Key)
           , m_Text(Text)

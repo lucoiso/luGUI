@@ -22,7 +22,7 @@ namespace luGUI
 
     public:
         template <typename... Args>
-        explicit inline ComboBox(const char *const &                     Label,
+        explicit constexpr ComboBox(const char *const &                     Label,
                                  std::vector<strzilla::string> *const    Options,
                                  std::function<void(strzilla::string)> &&OnChanged,
                                  Args &&...                              Arguments)

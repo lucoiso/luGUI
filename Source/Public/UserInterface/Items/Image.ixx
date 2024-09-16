@@ -30,14 +30,14 @@ namespace luGUI
 
     public:
         template <typename... Args>
-        explicit inline Image(const char *const Key, Args &&... Arguments)
+        explicit constexpr Image(const char *const Key, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Key(Key)
         {
         }
 
         template <typename... Args>
-        explicit inline Image(const char *const Key, ImageDefinitions &&Definitions, Args &&... Arguments)
+        explicit constexpr Image(const char *const Key, ImageDefinitions &&Definitions, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Key(Key)
           , m_Definitions(Definitions)

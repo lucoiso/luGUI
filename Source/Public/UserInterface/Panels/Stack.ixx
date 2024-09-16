@@ -25,27 +25,27 @@ namespace luGUI
 
     public:
         template <typename... Args>
-        explicit inline Stack(Args &&... Arguments)
+        explicit constexpr Stack(Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
         {
         }
 
         template <typename... Args>
-        explicit inline Stack(Orientation const Orientation, Args &&... Arguments)
+        explicit constexpr Stack(Orientation const Orientation, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Orientation(Orientation)
         {
         }
 
         template <typename... Args>
-        explicit inline Stack(std::vector<std::shared_ptr<Item>> &&Items, Args &&... Arguments)
+        explicit constexpr Stack(std::vector<std::shared_ptr<Item>> &&Items, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Items(Items)
         {
         }
 
         template <typename... Args>
-        explicit inline Stack(Orientation const Orientation, std::vector<std::shared_ptr<Item>> &&Items, Args &&... Arguments)
+        explicit constexpr Stack(Orientation const Orientation, std::vector<std::shared_ptr<Item>> &&Items, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Orientation(Orientation)
           , m_Items(Items)

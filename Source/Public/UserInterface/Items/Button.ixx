@@ -19,7 +19,7 @@ namespace luGUI
 
     public:
         template <typename... Args>
-        explicit inline Button(const char *const Label, std::function<void()> &&OnClicked, Args &&... Arguments)
+        explicit constexpr Button(const char *const Label, std::function<void()> &&OnClicked, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Label(Label)
           , m_OnClicked(OnClicked)
