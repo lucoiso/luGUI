@@ -31,7 +31,6 @@ namespace luGUI
           , m_Options(Options)
           , m_OnChanged(OnChanged)
         {
-            UpdateInternalOptions();
         }
 
         [[nodiscard]] inline std::int32_t GetCurrentSelection() const
@@ -62,7 +61,6 @@ namespace luGUI
         inline void SetOptions(std::vector<strzilla::string> *Options)
         {
             m_Options = Options;
-            UpdateInternalOptions();
         }
 
         inline void SetOnChanged(std::function<void(strzilla::string)> &&OnChanged)
