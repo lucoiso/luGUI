@@ -41,7 +41,7 @@ namespace luGUI
         virtual void PollEvents();
 
     protected:
-        void SetCallbacks();
+        void SetRendererRequiredCallbacks();
         void Draw();
 
         virtual void Refresh() override;

@@ -4,6 +4,11 @@
 
 module;
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 export module luGUI.Integrations.GLFWCallbacks;
 
 namespace luGUI

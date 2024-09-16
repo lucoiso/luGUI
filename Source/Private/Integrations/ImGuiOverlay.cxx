@@ -6,6 +6,11 @@ module;
 
 #include <imgui.h>
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 module luGUI.Integrations.ImGuiOverlay;
 
 import RenderCore.Renderer;
@@ -97,6 +102,8 @@ void luGUI::InitializeImGuiContext(GLFWwindow *const Window, bool const EnableDo
 
     ImGuiVulkanInit(ImGuiVulkanInitInfo);
     ImGuiVulkanCreateFontsTexture();
+
+    glfwPostEmptyEvent();
 }
 
 void luGUI::ReleaseImGuiResources()

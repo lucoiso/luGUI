@@ -6,10 +6,22 @@
 
 module;
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 export module luGUI.Integrations.ImGuiGLFWBackend;
+
+import RenderCore.Types.SurfaceProperties;
 
 namespace luGUI
 {
+    export [[nodiscard]] VkExtent2D                    GetFramebufferSize(GLFWwindow *);
+    export [[nodiscard]] VkExtent2D                    GetWindowExtent(GLFWwindow *, VkSurfaceCapabilitiesKHR const &);
+    export [[nodiscard]] std::vector<strzilla::string> GetGLFWExtensions();
+    export [[nodiscard]] RenderCore::SurfaceProperties GetSurfaceProperties(GLFWwindow *);
+
     export bool ImGuiGLFWInitForVulkan(GLFWwindow *, bool);
     export void ImGuiGLFWShutdown();
     export void ImGuiGLFWNewFrame();

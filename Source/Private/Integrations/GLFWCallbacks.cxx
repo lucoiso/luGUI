@@ -6,6 +6,11 @@ module;
 
 #include <imgui.h>
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 module luGUI.Integrations.GLFWCallbacks;
 
 import RenderCore.Renderer;

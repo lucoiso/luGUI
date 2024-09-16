@@ -8,18 +8,26 @@ module;
 
 #include <imgui.h>
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 #ifdef _WIN32
 #undef APIENTRY
 #define GLFW_EXPOSE_NATIVE_WIN32
 #endif
 #ifdef __APPLE__
-#define GLFW_EXPOSE_NATIVE_COCOA
+    #define GLFW_EXPOSE_NATIVE_COCOA
 #endif
 #include <GLFW/glfw3native.h>
 
 module luGUI.Integrations.ImGuiGLFWBackend;
 
 import RenderCore.Renderer;
+import RenderCore.Runtime.Device;
+import RenderCore.Types.SurfaceProperties;
+import RenderCore.Utils.Constants;
 
 using namespace luGUI;
 
@@ -59,6 +67,101 @@ struct ImGuiGLFWViewportData
     WNDPROC PrevWndProc {};
     #endif
 };
+
+VkExtent2D luGUI::GetFramebufferSize(GLFWwindow *const Window)
+{
+    std::int32_t Width  = 0U;
+    std::int32_t Height = 0U;
+    glfwGetFramebufferSize(Window, &Width, &Height);
+
+    return VkExtent2D { .width = static_cast<std::uint32_t>(Width), .height = static_cast<std::uint32_t>(Height) };
+}
+
+VkExtent2D luGUI::GetWindowExtent(GLFWwindow *const Window, VkSurfaceCapabilitiesKHR const &Capabilities)
+{
+    VkExtent2D ActualExtent = GetFramebufferSize(Window);
+
+    ActualExtent.width  = std::clamp(ActualExtent.width, Capabilities.minImageExtent.width, Capabilities.maxImageExtent.width);
+    ActualExtent.height = std::clamp(ActualExtent.height, Capabilities.minImageExtent.height, Capabilities.maxImageExtent.height);
+
+    return ActualExtent;
+}
+
+std::vector<strzilla::string> luGUI::GetGLFWExtensions()
+{
+    std::uint32_t   GLFWExtensionsCount = 0U;
+    char const **   GLFWExtensions      = glfwGetRequiredInstanceExtensions(&GLFWExtensionsCount);
+    std::span const GLFWExtensionsSpan(GLFWExtensions, GLFWExtensionsCount);
+
+    std::vector<strzilla::string> Output {};
+    Output.reserve(GLFWExtensionsCount);
+
+    if (!std::empty(GLFWExtensionsSpan))
+    {
+        for (char const *const &ExtensionIter : GLFWExtensionsSpan)
+        {
+            Output.emplace_back(ExtensionIter);
+        }
+    }
+    else
+    {
+        Output.emplace_back("VK_KHR_surface");
+
+        #ifdef WIN32
+        Output.emplace_back("VK_KHR_win32_surface");
+        #elif __linux__
+        Output.emplace_back("VK_KHR_xcb_surface");
+        #elif __APPLE__
+        Output.emplace_back("VK_KHR_macos_surface");
+        elif __ANDROID__ Output.emplace_back("VK_KHR_android_surface");
+        #endif
+    }
+
+    return Output;
+}
+
+RenderCore::SurfaceProperties luGUI::GetSurfaceProperties(GLFWwindow *const Window)
+{
+    std::vector<VkSurfaceFormatKHR> const SupportedFormats  = RenderCore::GetAvailablePhysicalDeviceSurfaceFormats();
+    [[maybe_unused]] auto const           PresentationModes = RenderCore::GetAvailablePhysicalDeviceSurfacePresentationModes();
+
+    RenderCore::SurfaceProperties Output {
+            .Format = SupportedFormats.front(),
+            .Extent = GetWindowExtent(Window, RenderCore::GetSurfaceCapabilities())
+    };
+
+    if (auto const MatchingFormat = std::ranges::find_if(RenderCore::g_PreferredImageFormats,
+                                                         [&SupportedFormats](VkFormat const &Format)
+                                                         {
+                                                             return std::ranges::find_if(SupportedFormats,
+                                                                                         [Format](VkSurfaceFormatKHR const &SurfaceFormat)
+                                                                                         {
+                                                                                             return SurfaceFormat.format == Format;
+                                                                                         }) != std::cend(SupportedFormats);
+                                                         });
+        MatchingFormat != std::cend(RenderCore::g_PreferredImageFormats))
+    {
+        Output.Format = SupportedFormats.at(std::distance(std::cbegin(RenderCore::g_PreferredImageFormats), MatchingFormat));
+    }
+
+    Output.Mode = RenderCore::Renderer::GetVSync() ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_IMMEDIATE_KHR;
+
+    VkPhysicalDevice const &PhysicalDevice = RenderCore::GetPhysicalDevice();
+
+    for (VkFormat const &FormatIter : RenderCore::g_PreferredDepthFormats)
+    {
+        VkFormatProperties FormatProperties;
+        vkGetPhysicalDeviceFormatProperties(PhysicalDevice, FormatIter, &FormatProperties);
+
+        if ((FormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0U)
+        {
+            Output.DepthFormat = FormatIter;
+            break;
+        }
+    }
+
+    return Output;
+}
 
 ImGuiGLFWData *ImGuiGLFWGetBackendData()
 {
@@ -340,10 +443,7 @@ bool ImGuiGLFWShouldChainCallback(GLFWwindow const *Window)
     return BackendData->CallbacksChainForAllWindows || Window == BackendData->Window;
 }
 
-void luGUI::ImGuiGLFWMouseButtonCallback(GLFWwindow *       Window,
-                                              std::int32_t const Button,
-                                              std::int32_t const Action,
-                                              std::int32_t const Modifications)
+void luGUI::ImGuiGLFWMouseButtonCallback(GLFWwindow *Window, std::int32_t const Button, std::int32_t const Action, std::int32_t const Modifications)
 {
     if (ImGuiGLFWData const *Backend = ImGuiGLFWGetBackendData();
         Backend->PrevUserCallbackMousebutton && ImGuiGLFWShouldChainCallback(Window))
@@ -371,10 +471,10 @@ void luGUI::ImGuiGLFWScrollCallback(GLFWwindow *Window, double const OffsetX, do
 }
 
 void luGUI::ImGuiGLFWKeyCallback(GLFWwindow *       Window,
-                                      std::int32_t const KeyCode,
-                                      std::int32_t const ScanCode,
-                                      std::int32_t const Action,
-                                      std::int32_t const Modifications)
+                                 std::int32_t const KeyCode,
+                                 std::int32_t const ScanCode,
+                                 std::int32_t const Action,
+                                 std::int32_t const Modifications)
 {
     ImGuiGLFWData *Backend = ImGuiGLFWGetBackendData();
     if (Backend->PrevUserCallbackKey != nullptr && ImGuiGLFWShouldChainCallback(Window))
@@ -643,7 +743,7 @@ void luGUI::ImGuiGLFWShutdown()
 
     for (std::uint8_t CursorIt = 0U; CursorIt < ImGuiMouseCursor_COUNT; ++CursorIt)
     {
-        if (auto* const Cursor = Backend->MouseCursors.at(CursorIt))
+        if (auto *const Cursor = Backend->MouseCursors.at(CursorIt))
         {
             glfwDestroyCursor(Cursor);
         }
@@ -956,7 +1056,7 @@ void ImGuiGLFWCreateWindow(ImGuiViewport *Viewport)
         #ifdef _WIN32
         Viewport->PlatformHandleRaw = glfwGetWin32Window(ViewportData->Window);
         #elif defined(__APPLE__)
-            Viewport->PlatformHandleRaw = static_cast<void *>(glfwGetCocoaWindow(ViewportData->Window));
+                Viewport->PlatformHandleRaw = static_cast<void *>(glfwGetCocoaWindow(ViewportData->Window));
         #endif
 
         glfwSetWindowPos(ViewportData->Window, static_cast<std::int32_t>(Viewport->Pos.x), static_cast<std::int32_t>(Viewport->Pos.y));
@@ -972,6 +1072,8 @@ void ImGuiGLFWCreateWindow(ImGuiViewport *Viewport)
         glfwSetWindowPosCallback(ViewportData->Window, ImGuiGLFWWindowPosCallback);
         glfwSetWindowSizeCallback(ViewportData->Window, ImGuiGLFWWindowSizeCallback);
     });
+
+    glfwPostEmptyEvent();
 }
 
 void ImGuiGLFWDestroyWindow(ImGuiViewport *Viewport)
@@ -1007,6 +1109,8 @@ void ImGuiGLFWDestroyWindow(ImGuiViewport *Viewport)
 
     Viewport->PlatformUserData = nullptr;
     Viewport->PlatformHandle   = nullptr;
+
+    glfwPostEmptyEvent();
 }
 
 void ImGuiGLFWShowWindow(ImGuiViewport *Viewport)
@@ -1032,6 +1136,8 @@ void ImGuiGLFWShowWindow(ImGuiViewport *Viewport)
 
         glfwShowWindow(ViewportData->Window);
     });
+
+    glfwPostEmptyEvent();
 }
 
 ImVec2 ImGuiGLFWGetWindowPos(ImGuiViewport *Viewport)
@@ -1082,6 +1188,8 @@ void ImGuiGLFWSetWindowSize(ImGuiViewport *Viewport, ImVec2 const Size)
         ViewportData->IgnoreWindowSizeEventFrame = ImGui::GetFrameCount();
         glfwSetWindowSize(ViewportData->Window, static_cast<std::int32_t>(Size.x), static_cast<std::int32_t>(Size.y));
     });
+
+    glfwPostEmptyEvent();
 }
 
 void ImGuiGLFWSetWindowTitle(ImGuiViewport *Viewport, char const *Title)
@@ -1096,6 +1204,8 @@ void ImGuiGLFWSetWindowTitle(ImGuiViewport *Viewport, char const *Title)
 
         glfwSetWindowTitle(ViewportData->Window, Title);
     });
+
+    glfwPostEmptyEvent();
 }
 
 void ImGuiGLFWSetWindowFocus(ImGuiViewport *Viewport)
@@ -1110,6 +1220,8 @@ void ImGuiGLFWSetWindowFocus(ImGuiViewport *Viewport)
 
         glfwFocusWindow(ViewportData->Window);
     });
+
+    glfwPostEmptyEvent();
 }
 
 bool ImGuiGLFWGetWindowFocus(ImGuiViewport *Viewport)
@@ -1156,6 +1268,8 @@ void ImGuiGLFWSetWindowAlpha(ImGuiViewport *Viewport, float const Alpha)
 
         glfwSetWindowOpacity(ViewportData->Window, Alpha);
     });
+
+    glfwPostEmptyEvent();
 }
 
 std::int32_t ImGuiGLFWCreateVkSurface(ImGuiViewport *Viewport, ImU64 const Instance, void const *Allocator, ImU64 *Surface)

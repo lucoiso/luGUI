@@ -8,6 +8,11 @@ module;
 
 #include <imgui.h>
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 module luGUI.Integrations.ImGuiVulkanBackend;
 
 import RenderCore.Types.SurfaceProperties;
@@ -880,6 +885,8 @@ void ImGuiVulkanCreateWindow(ImGuiViewport *Viewport)
         ImGuiVulkanCreateOrResizeWindow(WindowData, static_cast<std::int32_t>(Viewport->Size.x), static_cast<std::int32_t>(Viewport->Size.y));
         ViewportData->WindowOwned = true;
     });
+
+    glfwPostEmptyEvent();
 }
 
 void ImGuiVulkanDestroyViewport(ImGuiViewport *Viewport)

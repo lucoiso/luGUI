@@ -4,6 +4,11 @@
 
 module;
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 export module luGUI.Integrations.ImGuiOverlay;
 
 import luGUI.UserInterface.Controls.Control;
@@ -17,4 +22,4 @@ namespace luGUI
     export void               DrawImGuiFrame(Control *);
     export [[nodiscard]] bool IsImGuiInitialized();
     export void               RecordImGuiCommandBuffer(VkCommandBuffer const &, RenderCore::ImageAllocation const &);
-} // namespace RenderCore
+} // namespace luGUI

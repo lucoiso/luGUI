@@ -6,12 +6,22 @@ module;
 
 #include <stb_image.h>
 
+#ifdef GLFW_INCLUDE_VULKAN
+    #undef GLFW_INCLUDE_VULKAN
+#endif
+#include <GLFW/glfw3.h>
+
 module luGUI.UserInterface.Controls.Window;
 
 import Timer.Manager;
 import RenderCore.Renderer;
 import RenderCore.Runtime.Command;
+import RenderCore.Runtime.Instance;
+import RenderCore.Runtime.SwapChain;
+import RenderCore.Runtime.Device;
 import RenderCore.Utils.Helpers;
+import RenderCore.Utils.EnumHelpers;
+import RenderCore.Types.Allocation;
 import luGUI.Integrations.ImGuiOverlay;
 import luGUI.Integrations.ImGuiVulkanBackend;
 import luGUI.Integrations.ImGuiGLFWBackend;
@@ -43,7 +53,7 @@ bool Window::Initialize(std::uint16_t const Width, std::uint16_t const Height, s
 
     if (m_GLFWHandler.Initialize(m_Width, m_Height, m_Title, m_Flags))
     {
-        SetCallbacks();
+        SetRendererRequiredCallbacks();
 
         std::binary_semaphore Sync { 1U };
 
@@ -52,7 +62,7 @@ bool Window::Initialize(std::uint16_t const Width, std::uint16_t const Height, s
         s_TimerManager.SetTimer(std::chrono::nanoseconds { 0 },
                                 [&]
                                 {
-                                    [[maybe_unused]] bool const _ = RenderCore::Renderer::Initialize(m_GLFWHandler.GetWindow());
+                                    [[maybe_unused]] bool const _ = RenderCore::Renderer::Initialize();
                                     Sync.release();
                                     Draw();
                                 });
@@ -113,7 +123,8 @@ void Window::SetIcon(strzilla::string_view const &Path) const
 
     GLFWimage Icon;
     Icon.pixels = stbi_load(std::data(Path), &Icon.width, &Icon.height, nullptr, 4);
-    glfwSetWindowIcon(m_GLFWHandler.GetWindow(), 1, &Icon); stbi_image_free(Icon.pixels);
+    glfwSetWindowIcon(m_GLFWHandler.GetWindow(), 1, &Icon);
+    stbi_image_free(Icon.pixels);
 }
 
 void Window::PollEvents()
@@ -156,7 +167,7 @@ void Window::PollEvents()
     }
 }
 
-void Window::SetCallbacks()
+void Window::SetRendererRequiredCallbacks()
 {
     RenderCore::SetOnCommandPoolResetCallbackCallback([](std::uint8_t const Index)
     {
@@ -179,7 +190,22 @@ void Window::SetCallbacks()
         RecordImGuiCommandBuffer(CommandBuffer, SwapchainAllocation);
     });
 
-    RenderCore::Renderer::SetOnInitializeCallback([this]
+    RenderCore::SetOnSurfaceCreationCallback([this](VkSurfaceKHR &Surface)
+    {
+        RenderCore::CheckVulkanResult(glfwCreateWindowSurface(RenderCore::GetInstance(), m_GLFWHandler.GetWindow(), nullptr, &Surface));
+    });
+
+    RenderCore::SetOnGetSurfacePropertiesCallback([this]
+    {
+        return GetSurfaceProperties(m_GLFWHandler.GetWindow());
+    });
+
+    RenderCore::SetOnGetAdditionalInstanceExtensions([]
+    {
+        return GetGLFWExtensions();
+    });
+
+    RenderCore::SetOnInitializeCallback([this]
     {
         InitializeImGuiContext(m_GLFWHandler.GetWindow(),
                                HasFlag(m_Flags, InitializationFlags::ENABLE_DOCKING),
@@ -188,7 +214,7 @@ void Window::SetCallbacks()
         Control::Initialize();
     });
 
-    RenderCore::Renderer::SetOnRefreshCallback([this]
+    RenderCore::SetOnRefreshCallback([this]
     {
         if (!IsImGuiInitialized())
         {
@@ -201,9 +227,10 @@ void Window::SetCallbacks()
         });
 
         RefreshResources();
+        glfwPostEmptyEvent();
     });
 
-    RenderCore::Renderer::SetOnDrawCallback([this]
+    RenderCore::SetOnDrawCallback([this]
     {
         if (!IsImGuiInitialized())
         {
@@ -213,7 +240,7 @@ void Window::SetCallbacks()
         DrawImGuiFrame(this);
     });
 
-    RenderCore::Renderer::SetOnShutdownCallback([this]
+    RenderCore::SetOnShutdownCallback([this]
     {
         DestroyChildren();
         ReleaseImGuiResources();
@@ -245,7 +272,7 @@ void Window::Draw()
         {
             if (!IsResizingMainWindow())
             {
-                RenderCore::Renderer::DrawFrame(m_GLFWHandler.GetWindow(), DeltaTime);
+                RenderCore::Renderer::DrawFrame(DeltaTime);
             }
         }
         else
