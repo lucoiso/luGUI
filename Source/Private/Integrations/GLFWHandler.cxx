@@ -33,12 +33,14 @@ bool GLFWHandler::Initialize(std::uint16_t const         Width,
         GLFWErrorCallbacksSet = true;
     }
 
+    glfwDefaultWindowHints();
+
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-    glfwWindowHint(GLFW_MAXIMIZED, HasFlag(Flags, InitializationFlags::MAXIMIZED) ? GLFW_TRUE : GLFW_FALSE);
-    glfwWindowHint(GLFW_VISIBLE, HasFlag(Flags, InitializationFlags::HEADLESS) ? GLFW_FALSE : GLFW_TRUE);
-    glfwWindowHint(GLFW_DECORATED, HasFlag(Flags, InitializationFlags::WITHOUT_TITLEBAR) ? GLFW_FALSE : GLFW_TRUE);
-    glfwWindowHint(GLFW_FLOATING, HasFlag(Flags, InitializationFlags::ALWAYS_ON_TOP) ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_MAXIMIZED, RenderCore::HasFlag(Flags, InitializationFlags::MAXIMIZED) ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_VISIBLE, RenderCore::HasFlag(Flags, InitializationFlags::HEADLESS) ? GLFW_FALSE : GLFW_TRUE);
+    glfwWindowHint(GLFW_DECORATED, RenderCore::HasFlag(Flags, InitializationFlags::WITHOUT_TITLEBAR) ? GLFW_FALSE : GLFW_TRUE);
+    glfwWindowHint(GLFW_FLOATING, RenderCore::HasFlag(Flags, InitializationFlags::ALWAYS_ON_TOP) ? GLFW_TRUE : GLFW_FALSE);
 
     m_Window = glfwCreateWindow(Width, Height, std::data(Title), nullptr, nullptr);
 

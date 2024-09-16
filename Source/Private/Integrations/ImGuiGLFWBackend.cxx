@@ -14,12 +14,12 @@ module;
 #include <GLFW/glfw3.h>
 
 #ifdef _WIN32
-#undef APIENTRY
-#define GLFW_EXPOSE_NATIVE_WIN32
-#endif
+    #undef APIENTRY
+    #define GLFW_EXPOSE_NATIVE_WIN32
+#endif // _WIN32
 #ifdef __APPLE__
     #define GLFW_EXPOSE_NATIVE_COCOA
-#endif
+#endif // __APPLE__
 #include <GLFW/glfw3native.h>
 
 module luGUI.Integrations.ImGuiGLFWBackend;
@@ -30,43 +30,6 @@ import RenderCore.Types.SurfaceProperties;
 import RenderCore.Utils.Constants;
 
 using namespace luGUI;
-
-struct ImGuiGLFWData
-{
-    GLFWwindow *                                     Window {};
-    double                                           Time {};
-    GLFWwindow *                                     MouseWindow {};
-    std::array<GLFWcursor *, ImGuiMouseCursor_COUNT> MouseCursors {};
-    ImVec2                                           LastValidMousePos;
-    std::array<GLFWwindow *, GLFW_KEY_LAST>          KeyOwnerWindows {};
-    bool                                             InstalledCallbacks {};
-    bool                                             CallbacksChainForAllWindows {};
-    bool                                             WantUpdateMonitors {};
-
-    GLFWwindowfocusfun PrevUserCallbackWindowFocus {};
-    GLFWcursorposfun   PrevUserCallbackCursorPos {};
-    GLFWcursorenterfun PrevUserCallbackCursorEnter {};
-    GLFWmousebuttonfun PrevUserCallbackMousebutton {};
-    GLFWscrollfun      PrevUserCallbackScroll {};
-    GLFWkeyfun         PrevUserCallbackKey {};
-    GLFWcharfun        PrevUserCallbackChar {};
-    GLFWmonitorfun     PrevUserCallbackMonitor {};
-
-    #ifdef _WIN32
-    WNDPROC PrevWndProc {};
-    #endif
-};
-
-struct ImGuiGLFWViewportData
-{
-    GLFWwindow * Window {};
-    bool         WindowOwned {};
-    std::int32_t IgnoreWindowPosEventFrame { -1 };
-    std::int32_t IgnoreWindowSizeEventFrame { -1 };
-    #ifdef _WIN32
-    WNDPROC PrevWndProc {};
-    #endif
-};
 
 VkExtent2D luGUI::GetFramebufferSize(GLFWwindow *const Window)
 {
@@ -163,7 +126,7 @@ RenderCore::SurfaceProperties luGUI::GetSurfaceProperties(GLFWwindow *const Wind
     return Output;
 }
 
-ImGuiGLFWData *ImGuiGLFWGetBackendData()
+ImGuiGLFWData *luGUI::ImGuiGLFWGetBackendData()
 {
     return ImGui::GetCurrentContext() ? static_cast<ImGuiGLFWData *>(ImGui::GetIO().BackendPlatformUserData) : nullptr;
 }
@@ -621,7 +584,7 @@ void luGUI::ImGuiGLFWSetCallbacksChainForAllWindows(bool const Chain)
 }
 
 #ifdef _WIN32
-LRESULT CALLBACK ImGuiGLFWWndProc(HWND const Handle, UINT const Message, WPARAM const WParam, LPARAM const LParam)
+LRESULT CALLBACK luGUI::ImGuiGLFWWndProc(HWND const Handle, UINT const Message, WPARAM const WParam, LPARAM const LParam)
 {
     ImGuiGLFWData const *Backend           = ImGuiGLFWGetBackendData();
     WNDPROC              PreviousProcedure = Backend->PrevWndProc;
@@ -653,9 +616,14 @@ LRESULT CALLBACK ImGuiGLFWWndProc(HWND const Handle, UINT const Message, WPARAM 
         case WM_XBUTTONUP:
             ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
             break;
+        case WM_CLOSE:
+        case WM_DESTROY:
+            glfwSetWindowShouldClose(Backend->Window, GLFW_TRUE);
+            break;
         default:
             break;
     }
+
     return CallWindowProcW(PreviousProcedure, Handle, Message, WParam, LParam);
 }
 #endif
@@ -702,6 +670,7 @@ bool ImGuiGLFWInit(GLFWwindow *Window, bool const InstallCallbacks)
 
     ImGuiViewport *MainViewport  = ImGui::GetMainViewport();
     MainViewport->PlatformHandle = static_cast<void *>(Backend->Window);
+
     #ifdef _WIN32
     MainViewport->PlatformHandleRaw = glfwGetWin32Window(Backend->Window);
     #elif defined(__APPLE__)

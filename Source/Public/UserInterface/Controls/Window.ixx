@@ -31,12 +31,25 @@ namespace luGUI
         Window &operator=(Window const &) = delete;
         ~Window() override = default;
 
-        bool Initialize(std::uint16_t, std::uint16_t, strzilla::string_view, InitializationFlags Flags = InitializationFlags::NONE);
+        bool Initialize(std::uint16_t Width, std::uint16_t Height, strzilla::string_view Title, InitializationFlags Flags = InitializationFlags::NONE);
         void RequestClose();
         void Shutdown();
         [[nodiscard]] bool IsOpen() const;
 
         void SetIcon(strzilla::string_view const& Path) const;
+        [[nodiscard]] inline InitializationFlags GetInitializationFlags() const
+        {
+            return m_Flags;
+        }
+
+        void SetPosition(std::int32_t X, std::int32_t Y) const;
+        void SetTitle(strzilla::string_view const& Title) const;
+        [[nodiscard]] strzilla::string GetTitle() const;
+
+        #ifdef _WIN32
+        /** Experimental and unstable */
+        void SetAsChildOf(::HWND ParentHandle);
+        #endif // _WIN32
 
         virtual void PollEvents();
 

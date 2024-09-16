@@ -11,6 +11,16 @@ module;
 #endif
 #include <GLFW/glfw3.h>
 
+#ifdef _WIN32
+    #undef APIENTRY
+    #define GLFW_EXPOSE_NATIVE_WIN32
+#endif // _WIN32
+#ifdef __APPLE__
+    #define GLFW_EXPOSE_NATIVE_COCOA
+#endif // __APPLE__
+#include <imgui_internal.h>
+#include <GLFW/glfw3native.h>
+
 module luGUI.UserInterface.Controls.Window;
 
 import Timer.Manager;
@@ -127,6 +137,41 @@ void Window::SetIcon(strzilla::string_view const &Path) const
     stbi_image_free(Icon.pixels);
 }
 
+void Window::SetPosition(std::int32_t const X, std::int32_t const Y) const
+{
+    glfwSetWindowPos(m_GLFWHandler.GetWindow(), X, Y);
+}
+
+void Window::SetTitle(strzilla::string_view const &Title) const
+{
+    glfwSetWindowTitle(m_GLFWHandler.GetWindow(), std::data(Title));
+}
+
+strzilla::string Window::GetTitle() const
+{
+    return strzilla::string { glfwGetWindowTitle(m_GLFWHandler.GetWindow()) };
+}
+
+#ifdef _WIN32
+void Window::SetAsChildOf(::HWND const ParentHandle)
+{
+    GLFWwindow* const MyWindow = m_GLFWHandler.GetWindow();
+    ::HWND const MyHandle = glfwGetWin32Window(MyWindow);
+
+    ::SetParent(MyHandle, ParentHandle);
+
+    ::LONG Style = ::GetWindowLong(MyHandle, GWL_STYLE);
+    Style &= ~WS_POPUP;
+    Style |= WS_CHILDWINDOW;
+    ::SetWindowLong(MyHandle, GWL_STYLE, Style);
+
+    ::ShowWindow(MyHandle, SW_SHOW);
+    ::ShowWindow(ParentHandle, SW_SHOW);
+
+    ::SetWindowLongPtrW(MyHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ImGuiGLFWWndProc));
+}
+#endif // _WIN32
+
 void Window::PollEvents()
 {
     if (!IsOpen())
@@ -208,8 +253,8 @@ void Window::SetRendererRequiredCallbacks()
     RenderCore::SetOnInitializeCallback([this]
     {
         InitializeImGuiContext(m_GLFWHandler.GetWindow(),
-                               HasFlag(m_Flags, InitializationFlags::ENABLE_DOCKING),
-                               HasFlag(m_Flags, InitializationFlags::ENABLE_VIEWPORTS));
+                               RenderCore::HasFlag(m_Flags, InitializationFlags::ENABLE_DOCKING),
+                               RenderCore::HasFlag(m_Flags, InitializationFlags::ENABLE_VIEWPORTS));
 
         Control::Initialize();
     });
