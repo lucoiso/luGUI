@@ -25,28 +25,15 @@ namespace luGUI
 
     public:
         Stack() = default;
-        explicit Stack(Orientation Orientation);
-        explicit Stack(std::vector<std::shared_ptr<Item>> &&Items);
-        Stack(Orientation Orientation, std::vector<std::shared_ptr<Item>> &&Items);
+        explicit Stack(float Width);
+        explicit Stack(Orientation Orientation, float Width = 0.F);
+        explicit Stack(std::vector<std::shared_ptr<Item>> &&Items, float Width = 0.F);
+        Stack(Orientation Orientation, std::vector<std::shared_ptr<Item>> &&Items, float Width = 0.F);
 
-        static inline std::shared_ptr<Stack> Create()
+        template <typename... Args>
+        static constexpr std::shared_ptr<Stack> Create(Args &&... Arguments)
         {
-            return Construct<Stack>();
-        }
-
-        static inline std::shared_ptr<Stack> Create(Orientation const Orientation)
-        {
-            return Construct<Stack>(Orientation);
-        }
-
-        static inline std::shared_ptr<Stack> Create(std::vector<std::shared_ptr<Item>> &&Items)
-        {
-            return Construct<Stack>(std::move(Items));
-        }
-
-        static inline std::shared_ptr<Stack> Create(Orientation const Orientation, std::vector<std::shared_ptr<Item>> &&Items)
-        {
-            return Construct<Stack>(Orientation, std::move(Items));
+            return Construct<Stack>(std::forward<Args>(Arguments)...);
         }
 
         template <typename Type, typename... Args>
@@ -57,5 +44,8 @@ namespace luGUI
         }
 
         void Draw() override;
+
+    protected:
+        void Render() override;
     };
 } // namespace luGUI

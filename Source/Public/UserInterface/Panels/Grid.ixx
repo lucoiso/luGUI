@@ -14,20 +14,18 @@ namespace luGUI
 {
     export class LUGUIMODULE_API Grid : public Item, public std::enable_shared_from_this<Grid>
     {
+        std::int32_t m_NumColumns { 0 };
         std::vector<std::vector<std::shared_ptr<Item>>> m_Items {};
 
     public:
         Grid() = default;
-        explicit Grid(std::vector<std::vector<std::shared_ptr<Item>>> &&Items);
+        explicit Grid(float Width);
+        explicit Grid(std::vector<std::vector<std::shared_ptr<Item>>> &&Items, float Width = 0.F);
 
-        static inline std::shared_ptr<Grid> Create()
+        template <typename... Args>
+        static constexpr std::shared_ptr<Grid> Create(Args &&... Arguments)
         {
-            return Construct<Grid>();
-        }
-
-        static inline std::shared_ptr<Grid> Create(std::vector<std::vector<std::shared_ptr<Item>>> &&Items)
-        {
-            return Construct<Grid>(std::move(Items));
+            return Construct<Grid>(std::forward<Args>(Arguments)...);
         }
 
         template <typename Type, typename... Args>
@@ -48,5 +46,8 @@ namespace luGUI
         }
 
         void Draw() override;
+
+    protected:
+        void Render() override;
     };
 } // namespace luGUI

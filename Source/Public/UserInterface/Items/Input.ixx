@@ -50,28 +50,40 @@ namespace luGUI
     public:
         Input() = default;
 
-        explicit Input(strzilla::string_view const &Label)
-            : m_Label(Label)
-            , m_ID(strzilla::string { "##" } + m_Label)
+        explicit Input(float const Width)
+            : Item(Width)
         {
         }
 
-        explicit Input(strzilla::string_view const &Label, std::function<void(ValueType)> &&OnChanged)
-            : m_Label(Label)
-            , m_ID(strzilla::string { "##" } + m_Label)
-          , m_OnChanged(OnChanged)
-        {
-        }
-
-        explicit Input(strzilla::string_view const &Label, ConfigType const &Config)
-            : m_Config(Config)
+        explicit Input(strzilla::string_view const &Label, float const Width = 0.F)
+            : Item(Width)
           , m_Label(Label)
           , m_ID(strzilla::string { "##" } + m_Label)
         {
         }
 
-        explicit Input(strzilla::string_view const &Label, std::function<void(ValueType)> &&OnChanged, ConfigType const &Config)
-            : m_Config(Config)
+        explicit Input(strzilla::string_view const &Label, std::function<void(ValueType)> &&OnChanged, float const Width = 0.F)
+            : Item(Width)
+          , m_Label(Label)
+          , m_ID(strzilla::string { "##" } + m_Label)
+          , m_OnChanged(OnChanged)
+        {
+        }
+
+        explicit Input(strzilla::string_view const &Label, ConfigType const &Config, float const Width = 0.F)
+            : Item(Width)
+          , m_Config(Config)
+          , m_Label(Label)
+          , m_ID(strzilla::string { "##" } + m_Label)
+        {
+        }
+
+        explicit Input(strzilla::string_view const &    Label,
+                       std::function<void(ValueType)> &&OnChanged,
+                       ConfigType const &               Config,
+                       float const                      Width = 0.F)
+            : Item(Width)
+          , m_Config(Config)
           , m_Label(Label)
           , m_ID(strzilla::string { "##" } + m_Label)
           , m_OnChanged(OnChanged)
@@ -103,7 +115,8 @@ namespace luGUI
             m_OnChanged = OnChanged;
         }
 
-        inline void Draw() override
+    protected:
+        void Render() override
         {
             using DecayedInputType  = std::decay_t<ValueType>;
             using DecayedConfigType = std::decay_t<ConfigType>;

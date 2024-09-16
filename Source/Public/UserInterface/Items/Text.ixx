@@ -19,8 +19,9 @@ namespace luGUI
 
     public:
         Text() = default;
-        explicit Text(strzilla::string_view const &Key);
-        explicit Text(strzilla::string_view const &Key, strzilla::string_view const &Text);
+        explicit Text(float Width);
+        explicit Text(strzilla::string_view const &Key, float Width = 0.F);
+        explicit Text(strzilla::string_view const &Key, strzilla::string_view const &Text, float Width = 0.F);
 
         [[nodiscard]] inline strzilla::string_view GetKey() const
         {
@@ -42,6 +43,7 @@ namespace luGUI
             m_Text = Text;
         }
 
-        void Draw() override;
+    protected:
+        void Render() override;
     };
 } // namespace luGUI

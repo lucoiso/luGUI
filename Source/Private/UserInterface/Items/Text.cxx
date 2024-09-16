@@ -12,18 +12,25 @@ import luGUI.UserInterface.Singletons.FontManager;
 
 using namespace luGUI;
 
-Text::Text(strzilla::string_view const &Key)
-    : m_Key(Key)
+Text::Text(float const Width)
+    : Item(Width)
 {
 }
 
-Text::Text(strzilla::string_view const &Key, strzilla::string_view const &Text)
-    : m_Key(Key)
+Text::Text(strzilla::string_view const &Key, float const Width)
+    : Item(Width)
+  , m_Key(Key)
+{
+}
+
+Text::Text(strzilla::string_view const &Key, strzilla::string_view const &Text, float const Width)
+    : Item(Width)
+  , m_Key(Key)
   , m_Text(Text)
 {
 }
 
-void Text::Draw()
+void Text::Render()
 {
     ImFont *const Font = FontManager::Get().GetFont(m_Key);
     if (Font)

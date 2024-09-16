@@ -30,29 +30,31 @@ namespace luGUI
 
     public:
         Image() = default;
-        explicit Image(strzilla::string_view const& Key);
-        explicit Image(strzilla::string_view const& Key, ImageDefinitions&& Definitions);
+        explicit Image(float Width);
+        explicit Image(strzilla::string_view const &Key, float Width = 0.F);
+        explicit Image(strzilla::string_view const &Key, ImageDefinitions &&Definitions, float Width = 0.F);
 
         [[nodiscard]] inline strzilla::string_view GetKey() const
         {
             return m_Key;
         }
 
-        inline void SetKey(strzilla::string_view const& Key)
+        inline void SetKey(strzilla::string_view const &Key)
         {
             m_Key = Key;
         }
 
-        [[nodiscard]] inline ImageDefinitions const& GetDefinitions() const
+        [[nodiscard]] inline ImageDefinitions const &GetDefinitions() const
         {
             return m_Definitions;
         }
 
-        inline void SetDefinitions(ImageDefinitions&& Definitions)
+        inline void SetDefinitions(ImageDefinitions &&Definitions)
         {
             m_Definitions = Definitions;
         }
 
-        void Draw() override;
+    protected:
+        void Render() override;
     };
 } // namespace luGUI

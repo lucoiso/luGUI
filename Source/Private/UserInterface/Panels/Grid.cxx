@@ -5,13 +5,20 @@
 module;
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 module luGUI.UserInterface.Panels.Grid;
 
 using namespace luGUI;
 
-Grid::Grid(std::vector<std::vector<std::shared_ptr<Item>>> &&Items)
-    : m_Items(Items)
+Grid::Grid(float const Width)
+    : Item(Width)
+{
+}
+
+Grid::Grid(std::vector<std::vector<std::shared_ptr<Item>>> &&Items, float const Width)
+    : Item(Width)
+  , m_Items(Items)
 {
 }
 
@@ -22,17 +29,25 @@ void Grid::Draw()
         return;
     }
 
-    std::size_t MaxColumns = 0;
+    m_NumColumns = 0;
     for (const auto &LineIt : m_Items)
     {
         if (std::size_t const CurrentSize = std::size(LineIt);
-            CurrentSize > MaxColumns)
+            CurrentSize > m_NumColumns)
         {
-            MaxColumns = CurrentSize;
+            m_NumColumns = static_cast<std::int32_t>(CurrentSize);
         }
     }
 
-    ImGui::BeginTable("##GenericGridView", static_cast<std::int32_t>(MaxColumns));
+    Render();
+}
+
+void Grid::Render()
+{
+    ImGui::BeginTable("##GenericGridView", m_NumColumns);
+
+    auto const Flags = HasCustomWidth() ? ImGuiTableColumnFlags_WidthFixed : ImGuiTableColumnFlags_WidthStretch;
+    ImGui::TableSetupColumn(nullptr, Flags, m_Width / static_cast<float>(m_NumColumns));
 
     for (const auto &LineIt : m_Items)
     {

@@ -19,8 +19,9 @@ namespace luGUI
 
     public:
         Button() = default;
-        explicit Button(strzilla::string_view const &Label);
-        explicit Button(strzilla::string_view const &Label, std::function<void()> &&OnClicked);
+        explicit Button(float Width);
+        explicit Button(strzilla::string_view const &Label, float Width = 0.F);
+        explicit Button(strzilla::string_view const &Label, std::function<void()> &&OnClicked, float Width = 0.F);
 
         [[nodiscard]] inline strzilla::string_view GetLabel() const
         {
@@ -37,6 +38,7 @@ namespace luGUI
             m_OnClicked = OnClicked;
         }
 
-        void Draw() override;
+    protected:
+        void Render() override;
     };
 } // namespace luGUI

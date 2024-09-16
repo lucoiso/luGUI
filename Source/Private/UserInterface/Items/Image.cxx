@@ -12,18 +12,25 @@ import luGUI.UserInterface.Singletons.ImageManager;
 
 using namespace luGUI;
 
-Image::Image(strzilla::string_view const &Key)
-    : m_Key(Key)
+Image::Image(float const Width)
+    : Item(Width)
 {
 }
 
-Image::Image(strzilla::string_view const &Key, ImageDefinitions &&Definitions)
-    : m_Key(Key)
+Image::Image(strzilla::string_view const &Key, float const Width)
+    : Item(Width)
+  , m_Key(Key)
+{
+}
+
+Image::Image(strzilla::string_view const &Key, ImageDefinitions &&Definitions, float const Width)
+    : Item(Width)
+  , m_Key(Key)
   , m_Definitions(Definitions)
 {
 }
 
-void Image::Draw()
+void Image::Render()
 {
     VkDescriptorSet const ImageDescriptor = ImageManager::Get().GetDescriptor(m_Key);
     if (ImageDescriptor == VK_NULL_HANDLE)
