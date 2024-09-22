@@ -8,26 +8,19 @@ module;
 
 export module luGUI.UserInterface.Panels.Grid;
 
+import luGUI.UserInterface.Panels.Panel;
 import luGUI.UserInterface.Items.Item;
 
 namespace luGUI
 {
-    export class LUGUIMODULE_API Grid : public Item, public std::enable_shared_from_this<Grid>
+    export class LUGUIMODULE_API Grid : public Panel<std::vector<std::shared_ptr<Item>>>, public std::enable_shared_from_this<Grid>
     {
-        std::int32_t                                    m_NumColumns { 0 };
-        std::vector<std::vector<std::shared_ptr<Item>>> m_Items {};
+        std::int32_t m_NumColumns { 0 };
 
     public:
         template <typename... Args>
         explicit constexpr Grid(Args &&... Arguments)
-            : Item(std::forward<Args>(Arguments)...)
-        {
-        }
-
-        template <typename... Args>
-        explicit constexpr Grid(std::vector<std::vector<std::shared_ptr<Item>>> &&Items, Args &&... Arguments)
-            : Item(std::forward<Args>(Arguments)...)
-          , m_Items(Items)
+            : Panel(std::forward<Args>(Arguments)...)
         {
         }
 
@@ -38,7 +31,7 @@ namespace luGUI
         }
 
         template <typename Type>
-        std::shared_ptr<Grid> Add(std::size_t const Line, std::size_t const Column, std::shared_ptr<Type> && Item)
+        std::shared_ptr<Grid> Add(std::size_t const Line, std::size_t const Column, std::shared_ptr<Type> &&Item)
         {
             if (std::size(m_Items) <= Line)
             {
@@ -58,16 +51,6 @@ namespace luGUI
         std::shared_ptr<Grid> Add(std::size_t const Line, std::size_t const Column, Args &&... Arguments)
         {
             return Add(Line, Column, Item::Construct<Type>(std::forward<Args>(Arguments)...));
-        }
-
-        inline [[nodiscard]] bool IsEmpty() const
-        {
-            return std::empty(m_Items);
-        }
-
-        inline [[nodiscard]] std::size_t GetNumItems() const
-        {
-            return std::size(m_Items);
         }
 
         void Draw() override;

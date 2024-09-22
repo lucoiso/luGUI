@@ -5,7 +5,6 @@
 module;
 
 #include <imgui.h>
-#include <imgui_internal.h>
 
 module luGUI.UserInterface.Panels.Grid;
 
@@ -28,15 +27,15 @@ void Grid::Draw()
         }
     }
 
-    SetupItemAlignment();
+    SetupAlignment();
     Render();
 }
 
 void Grid::Render()
 {
-    m_ItemSize = { 0.F, 0.F };
-    bool const UsingCustomWidth = HasCustomWidth();
-    float const WidthPerItem = GetWidth() / static_cast<float>(m_NumColumns);
+    m_ItemSize                   = { 0.F, 0.F };
+    bool const  UsingCustomWidth = HasCustomWidth();
+    float const WidthPerItem     = GetWidth() / static_cast<float>(m_NumColumns);
 
     ImGui::BeginTable("##GenericGridView", m_NumColumns);
 
@@ -57,7 +56,7 @@ void Grid::Render()
 
             ColumnIt->Draw();
 
-            ImVec2 const& ItemItSize = ColumnIt->GetItemSize();
+            ImVec2 const &ItemItSize = ColumnIt->GetItemSize();
 
             m_ItemSize.x = ItemItSize.x > m_ItemSize.x ? ItemItSize.x : m_ItemSize.x;
             m_ItemSize.y = ItemItSize.y > m_ItemSize.y ? ItemItSize.y : m_ItemSize.y;

@@ -5,7 +5,6 @@
 module;
 
 #include <imgui.h>
-#include <imgui_internal.h>
 
 module luGUI.UserInterface.Panels.Stack;
 
@@ -18,13 +17,13 @@ void Stack::Draw()
         return;
     }
 
-    SetupItemAlignment();
+    SetupAlignment();
     Render();
 }
 
 void Stack::Render()
 {
-    m_ItemSize = { 0.F, 0.F };
+    m_ItemSize                  = { 0.F, 0.F };
     bool const UsingCustomWidth = HasCustomWidth();
 
     switch (m_Orientation)
@@ -43,7 +42,7 @@ void Stack::Render()
 
                 ItemIt->Draw();
 
-                ImVec2 const& ItemItSize = ItemIt->GetItemSize();
+                ImVec2 const &ItemItSize = ItemIt->GetItemSize();
 
                 m_ItemSize.x += ItemItSize.x;
                 m_ItemSize.y = ItemItSize.y > m_ItemSize.y ? ItemItSize.y : m_ItemSize.y;
@@ -68,7 +67,7 @@ void Stack::Render()
 
                 ItemIt->Draw();
 
-                ImVec2 const& ItemItSize = ItemIt->GetItemSize();
+                ImVec2 const &ItemItSize = ItemIt->GetItemSize();
 
                 m_ItemSize.x = ItemItSize.x > m_ItemSize.x ? ItemItSize.x : m_ItemSize.x;
                 m_ItemSize.y += ItemItSize.y;
