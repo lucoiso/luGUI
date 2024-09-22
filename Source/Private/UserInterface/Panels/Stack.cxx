@@ -18,32 +18,35 @@ void Stack::Draw()
         return;
     }
 
-    if (HasCustomWidth())
-    {
-        ImGui::PushMultiItemsWidths(static_cast<std::int32_t>(std::size(m_Items)), m_Width);
-    }
-
+    SetupItemAlignment();
     Render();
 }
 
 void Stack::Render()
 {
+    m_ItemSize = { 0.F, 0.F };
     bool const UsingCustomWidth = HasCustomWidth();
 
     switch (m_Orientation)
     {
         case Orientation::Horizontal:
         {
-            auto const SizePerItem = m_Width / static_cast<float>(std::size(m_Items));
+            auto const SizePerItem = GetWidth() / static_cast<float>(std::size(m_Items));
 
             for (std::size_t Iterator = 0; Iterator < std::size(m_Items); ++Iterator)
             {
+                auto const &ItemIt = m_Items.at(Iterator);
                 if (UsingCustomWidth)
                 {
-                    m_Items.at(Iterator)->SetWidth(SizePerItem);
+                    ItemIt->SetWidth(SizePerItem);
                 }
 
-                m_Items.at(Iterator)->Draw();
+                ItemIt->Draw();
+
+                ImVec2 const& ItemItSize = ItemIt->GetItemSize();
+
+                m_ItemSize.x += ItemItSize.x;
+                m_ItemSize.y = ItemItSize.y > m_ItemSize.y ? ItemItSize.y : m_ItemSize.y;
 
                 if (Iterator < std::size(m_Items) - 1)
                 {
@@ -60,10 +63,15 @@ void Stack::Render()
             {
                 if (UsingCustomWidth)
                 {
-                    ItemIt->SetWidth(m_Width);
+                    ItemIt->SetWidth(GetWidth());
                 }
 
                 ItemIt->Draw();
+
+                ImVec2 const& ItemItSize = ItemIt->GetItemSize();
+
+                m_ItemSize.x = ItemItSize.x > m_ItemSize.x ? ItemItSize.x : m_ItemSize.x;
+                m_ItemSize.y += ItemItSize.y;
             }
 
             ImGui::EndGroup();

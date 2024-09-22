@@ -19,6 +19,13 @@ namespace luGUI
 
     public:
         template <typename... Args>
+        explicit constexpr Text(const char *const &Text, Args &&... Arguments)
+            : Item(std::forward<Args>(Arguments)...)
+          , m_Text(Text)
+        {
+        }
+
+        template <typename... Args>
         explicit constexpr Text(const char *const Key, const char *const &Text, Args &&... Arguments)
             : Item(std::forward<Args>(Arguments)...)
           , m_Key(Key)

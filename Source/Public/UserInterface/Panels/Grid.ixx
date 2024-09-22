@@ -37,8 +37,8 @@ namespace luGUI
             return Construct<Grid>(std::forward<Args>(Arguments)...);
         }
 
-        template <typename Type, typename... Args>
-        std::shared_ptr<Grid> Add(std::size_t const Line, std::size_t const Column, Args &&... Arguments)
+        template <typename Type>
+        std::shared_ptr<Grid> Add(std::size_t const Line, std::size_t const Column, std::shared_ptr<Type> && Item)
         {
             if (std::size(m_Items) <= Line)
             {
@@ -50,8 +50,24 @@ namespace luGUI
                 m_Items.at(Line).resize(Column + 1);
             }
 
-            m_Items.at(Line).at(Column) = Item::Construct<Type>(std::forward<Args>(Arguments)...);
+            m_Items.at(Line).at(Column) = Item;
             return shared_from_this();
+        }
+
+        template <typename Type, typename... Args>
+        std::shared_ptr<Grid> Add(std::size_t const Line, std::size_t const Column, Args &&... Arguments)
+        {
+            return Add(Line, Column, Item::Construct<Type>(std::forward<Args>(Arguments)...));
+        }
+
+        inline [[nodiscard]] bool IsEmpty() const
+        {
+            return std::empty(m_Items);
+        }
+
+        inline [[nodiscard]] std::size_t GetNumItems() const
+        {
+            return std::size(m_Items);
         }
 
         void Draw() override;

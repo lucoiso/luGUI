@@ -6,6 +6,8 @@ module;
 
 #include "luGUIModule.hpp"
 
+#include <imgui.h>
+
 export module luGUI.UserInterface.Items.Item;
 
 namespace luGUI
@@ -29,6 +31,7 @@ namespace luGUI
     protected:
         float     m_Width { 0.F };
         Alignment m_Alignment { Alignment::None };
+        ImVec2    m_ItemSize { 0.F, 0.F };
 
     public:
         explicit Item(float Width = 0.F, Alignment Alignment = Alignment::None);
@@ -44,6 +47,11 @@ namespace luGUI
         [[nodiscard]] inline float GetWidth() const
         {
             return m_Width;
+        }
+
+        [[nodiscard]] inline ImVec2 const& GetItemSize() const
+        {
+            return m_ItemSize;
         }
 
         inline void SetWidth(float const Width)
@@ -71,5 +79,7 @@ namespace luGUI
         virtual void Render()
         {
         }
+
+        virtual void SetupItemAlignment();
     };
 } // namespace luGUI

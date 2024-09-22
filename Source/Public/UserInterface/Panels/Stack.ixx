@@ -58,11 +58,27 @@ namespace luGUI
             return Construct<Stack>(std::forward<Args>(Arguments)...);
         }
 
+        template <typename Type>
+        std::shared_ptr<Stack> Add(std::shared_ptr<Type> && Item)
+        {
+            m_Items.push_back(std::move(Item));
+            return shared_from_this();
+        }
+
         template <typename Type, typename... Args>
         std::shared_ptr<Stack> Add(Args &&... Arguments)
         {
-            m_Items.push_back(Item::Construct<Type>(std::forward<Args>(Arguments)...));
-            return shared_from_this();
+            return Add(Item::Construct<Type>(std::forward<Args>(Arguments)...));
+        }
+
+        inline [[nodiscard]] bool IsEmpty() const
+        {
+            return std::empty(m_Items);
+        }
+
+        inline [[nodiscard]] std::size_t GetNumItems() const
+        {
+            return std::size(m_Items);
         }
 
         void Draw() override;
