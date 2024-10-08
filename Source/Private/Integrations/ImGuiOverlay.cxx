@@ -123,7 +123,7 @@ void luGUI::ReleaseImGuiResources()
 
 void luGUI::DrawImGuiFrame(Control *Control)
 {
-    if (!ImGui::GetCurrentContext() || !IsImGuiInitialized())
+    if (!ImGui::GetCurrentContext() || !IsImGuiInitialized() || ImGui::GetIO().DisplaySize.x <= 0.F || ImGui::GetIO().DisplaySize.y <= 0.F)
     {
         return;
     }
